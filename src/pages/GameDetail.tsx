@@ -96,7 +96,7 @@ const GameDetail = () => {
               <div className="flex justify-center space-x-2">
                 {Object.entries(currentGame.divisionHead.socials).map(([platform, handle]) => (
                   <span key={platform} className="text-red-500 text-sm">
-                    {platform}: {handle}
+                    {platform}: {String(handle)}
                   </span>
                 ))}
               </div>
@@ -125,7 +125,7 @@ const GameDetail = () => {
                       <div className="space-y-1">
                         {Object.entries(player.socials).map(([platform, handle]) => (
                           <div key={platform} className="text-sm text-gray-400">
-                            <span className="capitalize text-red-400">{platform}:</span> {handle}
+                            <span className="capitalize text-red-400">{platform}:</span> {String(handle)}
                           </div>
                         ))}
                       </div>
