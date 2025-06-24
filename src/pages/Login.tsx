@@ -14,10 +14,10 @@ const Login = () => {
           <div className="bg-gray-900/50 rounded-xl p-8 border border-gray-800">
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-white font-bold text-xl">Z</span>
+                <span className="text-white font-bold text-xl">N</span>
               </div>
               <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-              <p className="text-gray-400">Sign in to your Zaispot account</p>
+              <p className="text-gray-400">Sign in to your Nitara Gaming account</p>
             </div>
 
             {/* User Type Selection */}
