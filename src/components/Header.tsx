@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingCart } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -48,10 +48,7 @@ const Header = () => {
           </nav>
 
           {/* Right side buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <button className="text-gray-300 hover:text-white transition-colors">
-              <ShoppingCart size={20} />
-            </button>
+          <div className="hidden md:flex items-center">
             <Link
               to="/login"
               className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors duration-200"
