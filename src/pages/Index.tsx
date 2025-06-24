@@ -81,7 +81,7 @@ const Index = () => {
               <span className="text-red-500"> Elite?</span>
             </h2>
             <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-              Take your gaming to the next level. Join Zaispot and compete with the best players in the world.
+              Take your gaming to the next level. Join Nitara Gaming and compete with the best players in the world.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

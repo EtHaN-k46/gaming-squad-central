@@ -41,7 +41,7 @@ const Hero = () => {
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Welcome to Zaispot, the ultimate destination for eSports teams and gaming enthusiasts. Join 
+            Welcome to Nitara Gaming, the ultimate destination for eSports teams and gaming enthusiasts. Join 
             forces with elite players, showcase your skills, and dominate the competitive arena.
           </p>
 
