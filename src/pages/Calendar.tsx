@@ -1,17 +1,28 @@
 
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useAuth } from '@/contexts/AuthContext';
+import AddEventDialog from '@/components/AddEventDialog';
+
+interface Event {
+  id: string;
+  title: string;
+  description: string | null;
+  game: string;
+  event_date: string;
+  event_time: string;
+}
 
 const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  // Mock events data
-  const events = [
-    { date: '2024-12-25', title: 'Apex Legends Practice', game: 'Apex Legends', time: '18:00' },
-    { date: '2024-12-26', title: 'Valorant Scrimmage', game: 'Valorant', time: '19:30' },
-    { date: '2024-12-27', title: 'COD Tournament Prep', game: 'Call of Duty', time: '20:00' },
-  ];
+  const { user } = useAuth();
+  const { canManageEvents } = useUserRole();
 
   const gameColors = {
     'Apex Legends': 'bg-orange-500',
@@ -20,6 +31,30 @@ const Calendar = () => {
     'Siege X': 'bg-blue-600',
     'Call of Duty Mobile': 'bg-purple-600'
   };
+
+  const fetchEvents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('event_date', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching events:', error);
+        return;
+      }
+
+      setEvents(data || []);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   const getDaysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -39,7 +74,7 @@ const Calendar = () => {
 
   const getEventsForDate = (year: number, month: number, day: number) => {
     const dateKey = formatDateKey(year, month, day);
-    return events.filter(event => event.date === dateKey);
+    return events.filter(event => event.event_date === dateKey);
   };
 
   const daysInMonth = getDaysInMonth(currentDate);
@@ -81,58 +116,67 @@ const Calendar = () => {
 
             {/* Calendar Grid */}
             <div className="p-6">
-              {/* Day headers */}
-              <div className="grid grid-cols-7 gap-2 mb-4">
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <div key={day} className="text-center text-gray-400 font-semibold py-2">
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              {/* Calendar days */}
-              <div className="grid grid-cols-7 gap-2">
-                {/* Empty cells for days before month starts */}
-                {Array.from({ length: firstDayOfMonth }, (_, index) => (
-                  <div key={`empty-${index}`} className="h-24 p-2"></div>
-                ))}
-
-                {/* Days of the month */}
-                {Array.from({ length: daysInMonth }, (_, index) => {
-                  const day = index + 1;
-                  const dayEvents = getEventsForDate(currentDate.getFullYear(), currentDate.getMonth(), day);
-                  const isToday = new Date().toDateString() === new Date(currentDate.getFullYear(), currentDate.getMonth(), day).toDateString();
-
-                  return (
-                    <div
-                      key={day}
-                      className={`h-24 p-2 border border-gray-700 rounded-lg cursor-pointer hover:border-gray-600 transition-colors ${
-                        isToday ? 'bg-red-600/10 border-red-600/50' : 'bg-gray-800/30'
-                      }`}
-                      onClick={() => setSelectedDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day))}
-                    >
-                      <div className={`text-sm font-semibold mb-1 ${isToday ? 'text-red-500' : 'text-white'}`}>
+              {loading ? (
+                <div className="text-center text-gray-400 py-8">
+                  Loading calendar events...
+                </div>
+              ) : (
+                <>
+                  {/* Day headers */}
+                  <div className="grid grid-cols-7 gap-2 mb-4">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                      <div key={day} className="text-center text-gray-400 font-semibold py-2">
                         {day}
                       </div>
-                      <div className="space-y-1">
-                        {dayEvents.slice(0, 2).map((event, eventIndex) => (
-                          <div
-                            key={eventIndex}
-                            className={`text-xs px-2 py-1 rounded text-white truncate ${
-                              gameColors[event.game as keyof typeof gameColors] || 'bg-gray-600'
-                            }`}
-                          >
-                            {event.time}
+                    ))}
+                  </div>
+
+                  {/* Calendar days */}
+                  <div className="grid grid-cols-7 gap-2">
+                    {/* Empty cells for days before month starts */}
+                    {Array.from({ length: firstDayOfMonth }, (_, index) => (
+                      <div key={`empty-${index}`} className="h-24 p-2"></div>
+                    ))}
+
+                    {/* Days of the month */}
+                    {Array.from({ length: daysInMonth }, (_, index) => {
+                      const day = index + 1;
+                      const dayEvents = getEventsForDate(currentDate.getFullYear(), currentDate.getMonth(), day);
+                      const isToday = new Date().toDateString() === new Date(currentDate.getFullYear(), currentDate.getMonth(), day).toDateString();
+
+                      return (
+                        <div
+                          key={day}
+                          className={`h-24 p-2 border border-gray-700 rounded-lg cursor-pointer hover:border-gray-600 transition-colors ${
+                            isToday ? 'bg-red-600/10 border-red-600/50' : 'bg-gray-800/30'
+                          }`}
+                          onClick={() => setSelectedDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day))}
+                        >
+                          <div className={`text-sm font-semibold mb-1 ${isToday ? 'text-red-500' : 'text-white'}`}>
+                            {day}
                           </div>
-                        ))}
-                        {dayEvents.length > 2 && (
-                          <div className="text-xs text-gray-400">+{dayEvents.length - 2} more</div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                          <div className="space-y-1">
+                            {dayEvents.slice(0, 2).map((event, eventIndex) => (
+                              <div
+                                key={eventIndex}
+                                className={`text-xs px-2 py-1 rounded text-white truncate ${
+                                  gameColors[event.game as keyof typeof gameColors] || 'bg-gray-600'
+                                }`}
+                                title={`${event.title} - ${event.event_time}`}
+                              >
+                                {event.event_time.slice(0, 5)}
+                              </div>
+                            ))}
+                            {dayEvents.length > 2 && (
+                              <div className="text-xs text-gray-400">+{dayEvents.length - 2} more</div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -149,13 +193,20 @@ const Calendar = () => {
             </div>
           </div>
 
-          {/* Add Event Button (for division heads) */}
-          <div className="mt-6 text-center">
-            <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg inline-flex items-center transition-colors">
-              <Plus size={20} className="mr-2" />
-              Add Practice Session
-            </button>
-          </div>
+          {/* Add Event Button (for division heads and admins) */}
+          {user && canManageEvents && (
+            <div className="mt-6 text-center">
+              <AddEventDialog onEventAdded={fetchEvents} />
+            </div>
+          )}
+
+          {user && !canManageEvents && (
+            <div className="mt-6 text-center">
+              <p className="text-gray-400 text-sm">
+                Contact an admin or division head to add events to the calendar.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
