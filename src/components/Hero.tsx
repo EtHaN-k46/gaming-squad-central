@@ -1,8 +1,11 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Hero = () => {
+  const { user } = useAuth();
+
   return (
     <section className="relative min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center overflow-hidden">
       {/* Background Pattern */}
@@ -33,31 +36,64 @@ const Hero = () => {
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-            The Ultimate 
-            <span className="block text-transparent bg-gradient-to-r from-red-500 to-red-600 bg-clip-text">
-              E-Sports Experience
-            </span>
-            <span className="block">Starts Here.</span>
+            {user ? (
+              <>
+                Welcome Back to 
+                <span className="block text-transparent bg-gradient-to-r from-red-500 to-red-600 bg-clip-text">
+                  Nitara Gaming
+                </span>
+              </>
+            ) : (
+              <>
+                The Ultimate 
+                <span className="block text-transparent bg-gradient-to-r from-red-500 to-red-600 bg-clip-text">
+                  E-Sports Experience
+                </span>
+                <span className="block">Starts Here.</span>
+              </>
+            )}
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Welcome to Nitara Gaming, the ultimate destination for eSports teams and gaming enthusiasts. Join 
-            forces with elite players, showcase your skills, and dominate the competitive arena.
+            {user ? (
+              "Ready to dominate the gaming arena? Check out the latest games and join your next tournament."
+            ) : (
+              "Welcome to Nitara Gaming, the ultimate destination for eSports teams and gaming enthusiasts. Join forces with elite players, showcase your skills, and dominate the competitive arena."
+            )}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link
-              to="/games"
-              className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-red-600/25"
-            >
-              Get Started
-            </Link>
-            <Link
-              to="/about"
-              className="border border-gray-600 hover:border-gray-400 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 hover:bg-gray-800/50"
-            >
-              Know More
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  to="/games"
+                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-red-600/25"
+                >
+                  Browse Games
+                </Link>
+                <Link
+                  to="/profile"
+                  className="border border-gray-600 hover:border-gray-400 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 hover:bg-gray-800/50"
+                >
+                  My Profile
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/auth"
+                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-red-600/25"
+                >
+                  Get Started
+                </Link>
+                <Link
+                  to="/about"
+                  className="border border-gray-600 hover:border-gray-400 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 hover:bg-gray-800/50"
+                >
+                  Know More
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
