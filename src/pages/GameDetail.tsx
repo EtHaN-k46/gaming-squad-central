@@ -54,6 +54,85 @@ const GameDetail = () => {
         role: 'Division Head',
         socials: { twitch: 'sarah_val_coach' }
       }
+    },
+    'siege-x': {
+      name: 'Siege X',
+      description: 'Elite tactical operations and strategic warfare. Our Siege X division excels in competitive 5v5 matches.',
+      teams: {
+        'Alpha Squad': [
+          { username: 'BreachSpecialist', socials: { twitch: 'breach_specialist' } },
+          { username: 'WallBanger', socials: { twitter: '@wallbanger_pro' } },
+          { username: 'SiteControl', socials: {} },
+          { username: 'FragHunter', socials: { youtube: 'FragHunter Tactics' } },
+        ],
+        'Bravo Squad': [
+          { username: 'AnchорMaster', socials: { twitch: 'anchor_master' } },
+          { username: 'RoamClear', socials: {} },
+          { username: 'ObjSecure', socials: { twitter: '@obj_secure' } },
+        ],
+        'Reserves': [
+          { username: 'TacticalRookie', socials: {} },
+          { username: 'SiegeProspect', socials: { twitch: 'siege_prospect' } },
+        ]
+      },
+      divisionHead: {
+        name: 'Marcus Thompson',
+        role: 'Division Head',
+        socials: { twitter: '@marcus_siege_coach', twitch: 'marcus_tactical' }
+      }
+    },
+    'call-of-duty': {
+      name: 'Call of Duty',
+      description: 'Fast-paced competitive warfare. Our COD division dominates in Search & Destroy and respawn game modes.',
+      teams: {
+        'Nitara Red': [
+          { username: 'QuickScope', socials: { twitch: 'quickscope_cod' } },
+          { username: 'RushKing', socials: { twitter: '@rushking_cod' } },
+          { username: 'ClutchGod', socials: { youtube: 'ClutchGod Gaming' } },
+          { username: 'FragOut', socials: {} },
+        ],
+        'Nitara Blue': [
+          { username: 'SnDMaster', socials: { twitch: 'snd_master' } },
+          { username: 'ObjPlayer', socials: {} },
+          { username: 'SlayerBot', socials: { twitter: '@slayerbot_cod' } },
+        ],
+        'Academy': [
+          { username: 'RisingSlayer', socials: {} },
+          { username: 'CODProspect', socials: { twitch: 'cod_prospect' } },
+          { username: 'NewBlood', socials: {} },
+        ]
+      },
+      divisionHead: {
+        name: 'Jake Williams',
+        role: 'Division Head',
+        socials: { twitter: '@jake_cod_coach', youtube: 'Jake COD Strats' }
+      }
+    },
+    'call-of-duty-mobile': {
+      name: 'Call of Duty Mobile',
+      description: 'Mobile gaming excellence. Competing in ranked matches, tournaments, and championship series.',
+      teams: {
+        'Mobile Legends': [
+          { username: 'ThumbMaster', socials: { twitch: 'thumb_master' } },
+          { username: 'MobileSlayer', socials: { twitter: '@mobile_slayer' } },
+          { username: 'TouchPro', socials: {} },
+          { username: 'PhoneFragger', socials: { youtube: 'PhoneFragger Pro' } },
+        ],
+        'Pocket Warriors': [
+          { username: 'SwipeKing', socials: { twitch: 'swipe_king' } },
+          { username: 'MobileClutch', socials: {} },
+          { username: 'TouchElite', socials: { twitter: '@touch_elite' } },
+        ],
+        'Rising Stars': [
+          { username: 'MobileNewbie', socials: {} },
+          { username: 'TouchTalent', socials: { twitch: 'touch_talent' } },
+        ]
+      },
+      divisionHead: {
+        name: 'Lisa Park',
+        role: 'Division Head',
+        socials: { twitter: '@lisa_mobile_coach', twitch: 'lisa_mobile_pro' }
+      }
     }
   };
 
