@@ -1,18 +1,23 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Edit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthContext';
 import AddEventDialog from '@/components/AddEventDialog';
+import EventDetailsModal from '@/components/EventDetailsModal';
+import TeamManagement from '@/components/TeamManagement';
 
 interface Event {
   id: string;
   title: string;
   description: string | null;
   game: string;
+  division: string | null;
   event_date: string;
   event_time: string;
+  is_recurring: boolean | null;
+  recurrence_day: number | null;
 }
 
 const Calendar = () => {
@@ -20,6 +25,8 @@ const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   
   const { user } = useAuth();
   const { canManageEvents } = useUserRole();
@@ -44,7 +51,9 @@ const Calendar = () => {
         return;
       }
 
-      setEvents(data || []);
+      // Generate recurring events for the current month view
+      const allEvents = generateRecurringEvents(data || [], currentDate);
+      setEvents(allEvents);
     } catch (error) {
       console.error('Error fetching events:', error);
     } finally {
@@ -52,9 +61,37 @@ const Calendar = () => {
     }
   };
 
+  const generateRecurringEvents = (baseEvents: Event[], viewDate: Date) => {
+    const allEvents: Event[] = [];
+    const startOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
+    const endOfMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0);
+
+    baseEvents.forEach(event => {
+      if (event.is_recurring && event.recurrence_day !== null) {
+        // Generate recurring events for the month
+        const currentDate = new Date(startOfMonth);
+        while (currentDate <= endOfMonth) {
+          if (currentDate.getDay() === event.recurrence_day) {
+            allEvents.push({
+              ...event,
+              id: `${event.id}-${currentDate.toISOString().split('T')[0]}`,
+              event_date: currentDate.toISOString().split('T')[0]
+            });
+          }
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      } else {
+        // Add non-recurring events
+        allEvents.push(event);
+      }
+    });
+
+    return allEvents;
+  };
+
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [currentDate]);
 
   const getDaysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -77,6 +114,29 @@ const Calendar = () => {
     return events.filter(event => event.event_date === dateKey);
   };
 
+  const formatTime = (timeString: string) => {
+    const [hours, minutes] = timeString.split(':');
+    const date = new Date();
+    date.setHours(parseInt(hours), parseInt(minutes));
+    return date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  const handleEventClick = (event: Event) => {
+    // If it's a recurring event with a generated ID, find the original event
+    const originalEvent = events.find(e => e.id === event.id.split('-')[0]) || event;
+    setSelectedEvent(originalEvent);
+  };
+
+  const handleEditEvent = (event: Event) => {
+    const originalEvent = events.find(e => e.id === event.id.split('-')[0]) || event;
+    setSelectedEvent(null);
+    setEditingEvent(originalEvent);
+  };
+
   const daysInMonth = getDaysInMonth(currentDate);
   const firstDayOfMonth = getFirstDayOfMonth(currentDate);
   const monthYear = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
@@ -93,7 +153,7 @@ const Calendar = () => {
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="bg-gray-900/50 rounded-xl border border-gray-800 overflow-hidden">
             {/* Calendar Header */}
             <div className="bg-gray-800/50 p-6 flex items-center justify-between">
@@ -135,7 +195,7 @@ const Calendar = () => {
                   <div className="grid grid-cols-7 gap-2">
                     {/* Empty cells for days before month starts */}
                     {Array.from({ length: firstDayOfMonth }, (_, index) => (
-                      <div key={`empty-${index}`} className="h-24 p-2"></div>
+                      <div key={`empty-${index}`} className="h-32 p-2"></div>
                     ))}
 
                     {/* Days of the month */}
@@ -147,28 +207,41 @@ const Calendar = () => {
                       return (
                         <div
                           key={day}
-                          className={`h-24 p-2 border border-gray-700 rounded-lg cursor-pointer hover:border-gray-600 transition-colors ${
+                          className={`h-32 p-2 border border-gray-700 rounded-lg hover:border-gray-600 transition-colors ${
                             isToday ? 'bg-red-600/10 border-red-600/50' : 'bg-gray-800/30'
                           }`}
-                          onClick={() => setSelectedDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day))}
                         >
-                          <div className={`text-sm font-semibold mb-1 ${isToday ? 'text-red-500' : 'text-white'}`}>
+                          <div className={`text-sm font-semibold mb-2 ${isToday ? 'text-red-500' : 'text-white'}`}>
                             {day}
                           </div>
-                          <div className="space-y-1">
-                            {dayEvents.slice(0, 2).map((event, eventIndex) => (
+                          <div className="space-y-1 overflow-hidden">
+                            {dayEvents.slice(0, 3).map((event, eventIndex) => (
                               <div
                                 key={eventIndex}
-                                className={`text-xs px-2 py-1 rounded text-white truncate ${
+                                className={`text-xs px-2 py-1 rounded text-white cursor-pointer hover:opacity-80 transition-opacity ${
                                   gameColors[event.game as keyof typeof gameColors] || 'bg-gray-600'
                                 }`}
-                                title={`${event.title} - ${event.event_time}`}
+                                onClick={() => handleEventClick(event)}
+                                title={`${event.title} - ${formatTime(event.event_time)} ${event.division ? `(${event.division})` : ''}`}
                               >
-                                {event.event_time.slice(0, 5)}
+                                <div className="font-medium truncate">{formatTime(event.event_time)}</div>
+                                {event.division && (
+                                  <div className="truncate opacity-90">{event.division}</div>
+                                )}
+                                {canManageEvents && (
+                                  <Edit 
+                                    size={10} 
+                                    className="inline ml-1 opacity-70"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleEditEvent(event);
+                                    }}
+                                  />
+                                )}
                               </div>
                             ))}
-                            {dayEvents.length > 2 && (
-                              <div className="text-xs text-gray-400">+{dayEvents.length - 2} more</div>
+                            {dayEvents.length > 3 && (
+                              <div className="text-xs text-gray-400 px-2">+{dayEvents.length - 3} more</div>
                             )}
                           </div>
                         </div>
@@ -196,7 +269,11 @@ const Calendar = () => {
           {/* Add Event Button (for division heads and admins) */}
           {user && canManageEvents && (
             <div className="mt-6 text-center">
-              <AddEventDialog onEventAdded={fetchEvents} />
+              <AddEventDialog 
+                onEventAdded={fetchEvents} 
+                editingEvent={editingEvent}
+                onCancelEdit={() => setEditingEvent(null)}
+              />
             </div>
           )}
 
@@ -207,7 +284,18 @@ const Calendar = () => {
               </p>
             </div>
           )}
+
+          {/* Team Management for Division Heads */}
+          {user && canManageEvents && <TeamManagement />}
         </div>
+
+        {/* Event Details Modal */}
+        <EventDetailsModal
+          event={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+          onEdit={handleEditEvent}
+          canEdit={canManageEvents}
+        />
       </div>
     </div>
   );

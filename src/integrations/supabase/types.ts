@@ -14,10 +14,13 @@ export type Database = {
           created_at: string | null
           created_by: string
           description: string | null
+          division: string | null
           event_date: string
           event_time: string
           game: string
           id: string
+          is_recurring: boolean | null
+          recurrence_day: number | null
           title: string
           updated_at: string | null
         }
@@ -25,10 +28,13 @@ export type Database = {
           created_at?: string | null
           created_by: string
           description?: string | null
+          division?: string | null
           event_date: string
           event_time: string
           game: string
           id?: string
+          is_recurring?: boolean | null
+          recurrence_day?: number | null
           title: string
           updated_at?: string | null
         }
@@ -36,10 +42,13 @@ export type Database = {
           created_at?: string | null
           created_by?: string
           description?: string | null
+          division?: string | null
           event_date?: string
           event_time?: string
           game?: string
           id?: string
+          is_recurring?: boolean | null
+          recurrence_day?: number | null
           title?: string
           updated_at?: string | null
         }
@@ -78,21 +87,69 @@ export type Database = {
         }
         Relationships: []
       }
+      team_members: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          discord: string | null
+          division: string
+          id: string
+          instagram: string | null
+          team_name: string
+          twitch: string | null
+          twitter: string | null
+          updated_at: string | null
+          username: string
+          youtube: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          discord?: string | null
+          division: string
+          id?: string
+          instagram?: string | null
+          team_name: string
+          twitch?: string | null
+          twitter?: string | null
+          updated_at?: string | null
+          username: string
+          youtube?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          discord?: string | null
+          division?: string
+          id?: string
+          instagram?: string | null
+          team_name?: string
+          twitch?: string | null
+          twitter?: string | null
+          updated_at?: string | null
+          username?: string
+          youtube?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
+          division: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
           created_at?: string | null
+          division?: string | null
           id?: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
           created_at?: string | null
+          division?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
