@@ -15,9 +15,25 @@ const GameCard: React.FC<GameCardProps> = ({ id, name, playerCount, image, descr
   return (
     <Link to={`/games/${id}`} className="group">
       <div className="bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800 hover:border-red-600/50 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-red-600/10">
-        <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          <h3 className="text-2xl font-bold text-white z-10">{name}</h3>
+        <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
+          {image ? (
+            <>
+              <img 
+                src={image} 
+                alt={name} 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <div className="absolute bottom-4 left-4 z-10">
+                <h3 className="text-2xl font-bold text-white drop-shadow-lg">{name}</h3>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-br from-red-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <h3 className="text-2xl font-bold text-white z-10 absolute inset-0 flex items-center justify-center">{name}</h3>
+            </>
+          )}
         </div>
         <div className="p-6">
           <p className="text-gray-400 mb-4 line-clamp-2">{description}</p>
