@@ -110,7 +110,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
         division: formData.division,
         event_date: formData.event_date,
         event_time: formData.event_time,
-        is_recurring: formData.is_recurring,
+        is_recurring: Boolean(formData.is_recurring),
         recurrence_day: formData.is_recurring ? formData.recurrence_day : null,
         created_by: user.id,
       };
