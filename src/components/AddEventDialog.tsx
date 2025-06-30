@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Plus, X, Edit, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -66,7 +65,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
         division: editingEvent.division || '',
         event_date: editingEvent.event_date,
         event_time: editingEvent.event_time,
-        is_recurring: editingEvent.is_recurring || false,
+        is_recurring: Boolean(editingEvent.is_recurring),
         recurrence_day: editingEvent.recurrence_day || 1,
       });
       setIsOpen(true);
