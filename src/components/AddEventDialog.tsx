@@ -65,7 +65,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
         division: editingEvent.division || '',
         event_date: editingEvent.event_date,
         event_time: editingEvent.event_time,
-        is_recurring: editingEvent.is_recurring === true,
+        is_recurring: Boolean(editingEvent.is_recurring),
         recurrence_day: editingEvent.recurrence_day || 1,
       });
       setIsOpen(true);
