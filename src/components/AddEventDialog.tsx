@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Plus, X, Edit, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -107,7 +108,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
     setLoading(true);
     try {
       // Create a boolean variable for is_recurring
-      const isRecurringValue: boolean = formData.is_recurring;
+      const isRecurringBoolean: boolean = formData.is_recurring;
       
       const eventData = {
         title: formData.title,
@@ -116,7 +117,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
         division: formData.division,
         event_date: formData.event_date,
         event_time: formData.event_time,
-        is_recurring: isRecurringValue,
+        is_recurring: isRecurringBoolean,
         recurrence_day: formData.is_recurring ? formData.recurrence_day : null,
         created_by: user.id,
       };
