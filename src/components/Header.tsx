@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, LogOut, User } from 'lucide-react';
@@ -45,8 +46,12 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-sm">N</span>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center">
+              <img 
+                src="/lovable-uploads/a1fca067-d591-4c53-9625-1589f2126a59.png" 
+                alt="Nitara Gaming" 
+                className="w-8 h-8 object-contain"
+              />
             </div>
             <span className="text-white font-bold text-xl">Nitara Gaming</span>
           </Link>
