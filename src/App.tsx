@@ -13,6 +13,7 @@ import Calendar from "./pages/Calendar";
 import About from "./pages/About";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
+import Players from "./pages/Players";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,7 +35,7 @@ const App = () => (
               <Route path="/about" element={<About />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/players" element={<div className="min-h-screen bg-black pt-20 flex items-center justify-center"><div className="text-white text-2xl">Players page coming soon...</div></div>} />
+              <Route path="/players" element={<Players />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
