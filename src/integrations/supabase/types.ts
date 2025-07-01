@@ -61,7 +61,9 @@ export type Database = {
           created_at: string | null
           first_name: string | null
           id: string
+          is_division_head: boolean | null
           last_name: string | null
+          preferred_division: string | null
           updated_at: string | null
           username: string | null
         }
@@ -71,7 +73,9 @@ export type Database = {
           created_at?: string | null
           first_name?: string | null
           id: string
+          is_division_head?: boolean | null
           last_name?: string | null
+          preferred_division?: string | null
           updated_at?: string | null
           username?: string | null
         }
@@ -81,7 +85,9 @@ export type Database = {
           created_at?: string | null
           first_name?: string | null
           id?: string
+          is_division_head?: boolean | null
           last_name?: string | null
+          preferred_division?: string | null
           updated_at?: string | null
           username?: string | null
         }
@@ -95,7 +101,9 @@ export type Database = {
           division: string
           id: string
           instagram: string | null
+          is_captain: boolean | null
           team_name: string
+          team_number: number | null
           twitch: string | null
           twitter: string | null
           updated_at: string | null
@@ -109,7 +117,9 @@ export type Database = {
           division: string
           id?: string
           instagram?: string | null
+          is_captain?: boolean | null
           team_name: string
+          team_number?: number | null
           twitch?: string | null
           twitter?: string | null
           updated_at?: string | null
@@ -123,12 +133,44 @@ export type Database = {
           division?: string
           id?: string
           instagram?: string | null
+          is_captain?: boolean | null
           team_name?: string
+          team_number?: number | null
           twitch?: string | null
           twitter?: string | null
           updated_at?: string | null
           username?: string
           youtube?: string | null
+        }
+        Relationships: []
+      }
+      team_settings: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          division: string
+          id: string
+          team1_max_players: number | null
+          team2_max_players: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          division: string
+          id?: string
+          team1_max_players?: number | null
+          team2_max_players?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          division?: string
+          id?: string
+          team1_max_players?: number | null
+          team2_max_players?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }

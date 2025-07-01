@@ -11,8 +11,8 @@ interface TeamMember {
   division: string;
   team_name: string;
   username: string;
-  team_number?: number;
-  is_captain?: boolean;
+  team_number: number;
+  is_captain: boolean;
   discord?: string;
   twitch?: string;
   twitter?: string;
@@ -109,11 +109,11 @@ const TeamManagement = () => {
         return;
       }
 
-      // Handle missing team_number and is_captain fields
+      // Handle the new database columns properly
       const membersWithDefaults = (data || []).map(member => ({
         ...member,
-        team_number: member.team_number || 1,
-        is_captain: member.is_captain || false,
+        team_number: member.team_number ?? 1,
+        is_captain: member.is_captain ?? false,
       }));
 
       setTeamMembers(membersWithDefaults);
@@ -126,24 +126,35 @@ const TeamManagement = () => {
     if (!userDivision) return;
 
     try {
-      // Check if team_settings table exists by trying to query it
       const { data, error } = await supabase
-        .from('team_members') // Use existing table to avoid errors
-        .select('division')
+        .from('team_settings')
+        .select('*')
         .eq('division', userDivision)
-        .limit(1);
+        .single();
 
-      // For now, use default settings since team_settings table may not exist
-      setTeamSettings({
-        division: userDivision,
-        team1_max_players: 5,
-        team2_max_players: 5,
-      });
-      
-      setSettingsData({
-        team1_max_players: 5,
-        team2_max_players: 5,
-      });
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching team settings:', error);
+        return;
+      }
+
+      if (data) {
+        setTeamSettings(data);
+        setSettingsData({
+          team1_max_players: data.team1_max_players ?? 5,
+          team2_max_players: data.team2_max_players ?? 5,
+        });
+      } else {
+        // Default settings if none exist
+        setTeamSettings({
+          division: userDivision,
+          team1_max_players: 5,
+          team2_max_players: 5,
+        });
+        setSettingsData({
+          team1_max_players: 5,
+          team2_max_players: 5,
+        });
+      }
     } catch (error) {
       console.error('Error fetching team settings:', error);
     }
@@ -159,6 +170,8 @@ const TeamManagement = () => {
         division: userDivision,
         team_name: formData.team_name,
         username: formData.username,
+        team_number: formData.team_number,
+        is_captain: formData.is_captain,
         discord: formData.discord || null,
         twitch: formData.twitch || null,
         twitter: formData.twitter || null,
@@ -209,13 +222,46 @@ const TeamManagement = () => {
     e.preventDefault();
     if (!user || !userDivision) return;
 
-    // For now, just show success message since team_settings table may not exist
-    toast({
-      title: "Team settings updated successfully",
-      description: "The team size limits have been updated.",
-    });
+    setLoading(true);
+    try {
+      const settingsPayload = {
+        division: userDivision,
+        team1_max_players: settingsData.team1_max_players,
+        team2_max_players: settingsData.team2_max_players,
+        created_by: user.id,
+      };
 
-    setIsSettingsOpen(false);
+      if (teamSettings?.id) {
+        const { error } = await supabase
+          .from('team_settings')
+          .update(settingsPayload)
+          .eq('id', teamSettings.id);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('team_settings')
+          .insert(settingsPayload);
+
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Team settings updated successfully",
+        description: "The team size limits have been updated.",
+      });
+
+      setIsSettingsOpen(false);
+      fetchTeamSettings();
+    } catch (error: any) {
+      toast({
+        title: "Error updating team settings",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEdit = (member: TeamMember) => {
@@ -223,8 +269,8 @@ const TeamManagement = () => {
     setFormData({
       team_name: member.team_name,
       username: member.username,
-      team_number: member.team_number || 1,
-      is_captain: member.is_captain || false,
+      team_number: member.team_number,
+      is_captain: member.is_captain,
       discord: member.discord || '',
       twitch: member.twitch || '',
       twitter: member.twitter || '',
@@ -277,7 +323,7 @@ const TeamManagement = () => {
   };
 
   const groupedMembers = teamMembers.reduce((acc, member) => {
-    const key = `Team ${member.team_number || 1}`;
+    const key = `Team ${member.team_number}`;
     if (!acc[key]) {
       acc[key] = [];
     }

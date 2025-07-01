@@ -10,8 +10,8 @@ interface TeamMember {
   division: string;
   team_name: string;
   username: string;
-  team_number?: number;
-  is_captain?: boolean;
+  team_number: number;
+  is_captain: boolean;
   discord?: string;
   twitch?: string;
   twitter?: string;
@@ -58,21 +58,34 @@ const Players = () => {
 
       if (membersError) throw membersError;
 
-      // Handle missing team_number and is_captain fields
+      // Handle the new database columns properly
       const membersWithDefaults = (membersData || []).map(member => ({
         ...member,
-        team_number: member.team_number || 1,
-        is_captain: member.is_captain || false,
+        team_number: member.team_number ?? 1,
+        is_captain: member.is_captain ?? false,
       }));
 
       setTeamMembers(membersWithDefaults);
 
-      // Set default team settings since table may not exist yet
-      const defaultSettings = divisions.map(division => ({
-        division,
-        team1_max_players: 5,
-        team2_max_players: 5,
-      }));
+      // Fetch team settings
+      const { data: settingsData, error: settingsError } = await supabase
+        .from('team_settings')
+        .select('*');
+
+      if (settingsError && settingsError.code !== 'PGRST116') {
+        console.error('Error fetching team settings:', settingsError);
+      }
+
+      // Set default team settings or use fetched data
+      const settings = settingsData || [];
+      const defaultSettings = divisions.map(division => {
+        const existingSetting = settings.find(s => s.division === division);
+        return existingSetting || {
+          division,
+          team1_max_players: 5,
+          team2_max_players: 5,
+        };
+      });
       
       setTeamSettings(defaultSettings);
     } catch (error) {
@@ -89,8 +102,8 @@ const Players = () => {
 
   const getTeamsByDivision = (division: string) => {
     const divisionMembers = teamMembers.filter(member => member.division === division);
-    const team1 = divisionMembers.filter(member => (member.team_number || 1) === 1);
-    const team2 = divisionMembers.filter(member => (member.team_number || 1) === 2);
+    const team1 = divisionMembers.filter(member => member.team_number === 1);
+    const team2 = divisionMembers.filter(member => member.team_number === 2);
     return { team1, team2 };
   };
 
