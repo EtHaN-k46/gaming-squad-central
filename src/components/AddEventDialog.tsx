@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,11 +12,25 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
-interface AddEventDialogProps {
-  onEventAdded: () => void;
+interface Event {
+  id: string;
+  title: string;
+  description: string | null;
+  game: string;
+  division: string | null;
+  event_date: string;
+  event_time: string;
+  is_recurring: boolean | null;
+  recurrence_day: number | null;
 }
 
-const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded }) => {
+interface AddEventDialogProps {
+  onEventAdded: () => void;
+  editingEvent?: Event | null;
+  onCancelEdit?: () => void;
+}
+
+const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEvent, onCancelEdit }) => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -50,6 +64,21 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded }) => {
     { value: 6, label: 'Saturday' }
   ];
 
+  // Effect to handle editing mode
+  useEffect(() => {
+    if (editingEvent) {
+      setOpen(true);
+      setTitle(editingEvent.title);
+      setDescription(editingEvent.description || '');
+      setGame(editingEvent.game);
+      setDivision(editingEvent.division || '');
+      setEventDate(editingEvent.event_date);
+      setEventTime(editingEvent.event_time);
+      setIsRecurring(editingEvent.is_recurring || false);
+      setRecurrenceDay(editingEvent.recurrence_day);
+    }
+  }, [editingEvent]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -71,39 +100,58 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded }) => {
     setLoading(true);
 
     try {
-      const { error } = await supabase
-        .from('events')
-        .insert({
-          title,
-          description: description || null,
-          game,
-          division: division || null,
-          event_date: eventDate,
-          event_time: eventTime,
-          is_recurring: isRecurring,
-          recurrence_day: isRecurring ? recurrenceDay : null,
-          created_by: user.id
-        });
+      if (editingEvent) {
+        // Update existing event
+        const { error } = await supabase
+          .from('events')
+          .update({
+            title,
+            description: description || null,
+            game,
+            division: division || null,
+            event_date: eventDate,
+            event_time: eventTime,
+            is_recurring: isRecurring,
+            recurrence_day: isRecurring ? recurrenceDay : null,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', editingEvent.id);
 
-      if (error) throw error;
+        if (error) throw error;
+        toast.success('Event updated successfully!');
+      } else {
+        // Create new event
+        const { error } = await supabase
+          .from('events')
+          .insert({
+            title,
+            description: description || null,
+            game,
+            division: division || null,
+            event_date: eventDate,
+            event_time: eventTime,
+            is_recurring: isRecurring,
+            recurrence_day: isRecurring ? recurrenceDay : null,
+            created_by: user.id
+          });
 
-      toast.success('Event created successfully!');
+        if (error) throw error;
+        toast.success('Event created successfully!');
+      }
       
       // Reset form
-      setTitle('');
-      setDescription('');
-      setGame('');
-      setDivision('');
-      setEventDate('');
-      setEventTime('');
-      setIsRecurring(false);
-      setRecurrenceDay(null);
+      resetForm();
       setOpen(false);
+      
+      // Cancel editing mode
+      if (onCancelEdit) {
+        onCancelEdit();
+      }
       
       onEventAdded();
     } catch (error) {
-      console.error('Error creating event:', error);
-      toast.error('Failed to create event');
+      console.error('Error saving event:', error);
+      toast.error(`Failed to ${editingEvent ? 'update' : 'create'} event`);
     } finally {
       setLoading(false);
     }
@@ -120,11 +168,19 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded }) => {
     setRecurrenceDay(null);
   };
 
+  const handleCancel = () => {
+    setOpen(false);
+    resetForm();
+    if (onCancelEdit) {
+      onCancelEdit();
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={(newOpen) => {
       setOpen(newOpen);
       if (!newOpen) {
-        resetForm();
+        handleCancel();
       }
     }}>
       <DialogTrigger asChild>
@@ -137,7 +193,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded }) => {
         <DialogHeader>
           <DialogTitle className="text-white flex items-center">
             <Calendar className="w-5 h-5 mr-2 text-red-500" />
-            Create New Event
+            {editingEvent ? 'Edit Event' : 'Create New Event'}
           </DialogTitle>
         </DialogHeader>
         
@@ -264,10 +320,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded }) => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => {
-                setOpen(false);
-                resetForm();
-              }}
+              onClick={handleCancel}
               className="border-gray-600 text-gray-300 hover:bg-gray-800"
             >
               Cancel
@@ -277,7 +330,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded }) => {
               disabled={loading}
               className="bg-red-600 hover:bg-red-700 text-white"
             >
-              {loading ? 'Creating...' : 'Create Event'}
+              {loading ? (editingEvent ? 'Updating...' : 'Creating...') : (editingEvent ? 'Update Event' : 'Create Event')}
             </Button>
           </div>
         </form>
