@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      division_heads: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          display_name: string
+          division: string
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          display_name: string
+          division: string
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          display_name?: string
+          division?: string
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           created_at: string | null
@@ -97,6 +127,7 @@ export type Database = {
         Row: {
           created_at: string | null
           created_by: string
+          custom_team_name: string | null
           discord: string | null
           division: string
           id: string
@@ -113,6 +144,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           created_by: string
+          custom_team_name?: string | null
           discord?: string | null
           division: string
           id?: string
@@ -129,6 +161,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           created_by?: string
+          custom_team_name?: string | null
           discord?: string | null
           division?: string
           id?: string
@@ -151,7 +184,9 @@ export type Database = {
           division: string
           id: string
           team1_max_players: number | null
+          team1_name: string | null
           team2_max_players: number | null
+          team2_name: string | null
           updated_at: string | null
         }
         Insert: {
@@ -160,7 +195,9 @@ export type Database = {
           division: string
           id?: string
           team1_max_players?: number | null
+          team1_name?: string | null
           team2_max_players?: number | null
+          team2_name?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -169,7 +206,9 @@ export type Database = {
           division?: string
           id?: string
           team1_max_players?: number | null
+          team1_name?: string | null
           team2_max_players?: number | null
+          team2_name?: string | null
           updated_at?: string | null
         }
         Relationships: []

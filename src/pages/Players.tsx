@@ -4,6 +4,8 @@ import { Users, Crown, Shield, Edit } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthContext';
+import TeamNameEditor from '@/components/TeamNameEditor';
+import DivisionHeadManager from '@/components/DivisionHeadManager';
 
 interface TeamMember {
   id: string;
@@ -23,6 +25,8 @@ interface TeamSettings {
   division: string;
   team1_max_players: number;
   team2_max_players: number;
+  team1_name: string;
+  team2_name: string;
 }
 
 const Players = () => {
@@ -58,7 +62,6 @@ const Players = () => {
 
       if (membersError) throw membersError;
 
-      // Handle the new database columns properly
       const membersWithDefaults = (membersData || []).map(member => ({
         ...member,
         team_number: member.team_number ?? 1,
@@ -67,7 +70,6 @@ const Players = () => {
 
       setTeamMembers(membersWithDefaults);
 
-      // Fetch team settings
       const { data: settingsData, error: settingsError } = await supabase
         .from('team_settings')
         .select('*');
@@ -76,7 +78,6 @@ const Players = () => {
         console.error('Error fetching team settings:', settingsError);
       }
 
-      // Set default team settings or use fetched data
       const settings = settingsData || [];
       const defaultSettings = divisions.map(division => {
         const existingSetting = settings.find(s => s.division === division);
@@ -84,6 +85,8 @@ const Players = () => {
           division,
           team1_max_players: 5,
           team2_max_players: 5,
+          team1_name: 'Team 1',
+          team2_name: 'Team 2',
         };
       });
       
@@ -111,7 +114,9 @@ const Players = () => {
     return teamSettings.find(setting => setting.division === division) || {
       division,
       team1_max_players: 5,
-      team2_max_players: 5
+      team2_max_players: 5,
+      team1_name: 'Team 1',
+      team2_name: 'Team 2'
     };
   };
 
@@ -162,6 +167,11 @@ const Players = () => {
           ))}
         </div>
 
+        {/* Admin/Division Head Management */}
+        {user && canManageEvents && (
+          <DivisionHeadManager isAdmin={role === 'admin'} />
+        )}
+
         {/* Teams Display */}
         <div className="space-y-12">
           {(selectedDivision === 'all' ? divisions : [selectedDivision]).map((division, divisionIndex) => {
@@ -183,13 +193,21 @@ const Players = () => {
                       {division}
                     </h2>
 
+                    {/* Team Name Editor for Division Heads and Admins */}
+                    {user && canManageEvents && (
+                      <TeamNameEditor 
+                        division={division} 
+                        canEdit={true}
+                      />
+                    )}
+
                     <div className="grid md:grid-cols-2 gap-8">
                       {/* Team 1 */}
                       <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700">
                         <div className="flex items-center justify-between mb-4">
                           <h3 className="text-xl font-semibold text-white flex items-center">
                             <Users className="mr-2" size={20} />
-                            Team 1
+                            {settings.team1_name}
                           </h3>
                           <span className="text-gray-400 text-sm">
                             {team1.length}/{settings.team1_max_players} players
@@ -242,7 +260,7 @@ const Players = () => {
                           
                           {team1.length === 0 && (
                             <div className="text-center text-gray-500 py-8">
-                              No players assigned to Team 1
+                              No players assigned to {settings.team1_name}
                             </div>
                           )}
                         </div>
@@ -253,7 +271,7 @@ const Players = () => {
                         <div className="flex items-center justify-between mb-4">
                           <h3 className="text-xl font-semibold text-white flex items-center">
                             <Users className="mr-2" size={20} />
-                            Team 2
+                            {settings.team2_name}
                           </h3>
                           <span className="text-gray-400 text-sm">
                             {team2.length}/{settings.team2_max_players} players
@@ -306,7 +324,7 @@ const Players = () => {
                           
                           {team2.length === 0 && (
                             <div className="text-center text-gray-500 py-8">
-                              No players assigned to Team 2
+                              No players assigned to {settings.team2_name}
                             </div>
                           )}
                         </div>

@@ -59,9 +59,6 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
 
   useEffect(() => {
     if (editingEvent) {
-      // Convert is_recurring to proper boolean
-      const isRecurringBoolean = Boolean(editingEvent.is_recurring);
-      
       setFormData({
         title: editingEvent.title,
         description: editingEvent.description || '',
@@ -69,7 +66,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
         division: editingEvent.division || '',
         event_date: editingEvent.event_date,
         event_time: editingEvent.event_time,
-        is_recurring: isRecurringBoolean,
+        is_recurring: Boolean(editingEvent.is_recurring),
         recurrence_day: editingEvent.recurrence_day || 1,
       });
       setIsOpen(true);
@@ -107,9 +104,6 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
 
     setLoading(true);
     try {
-      // Create a boolean variable for is_recurring
-      const isRecurringBoolean: boolean = formData.is_recurring;
-      
       const eventData = {
         title: formData.title,
         description: formData.description,
@@ -117,7 +111,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({
         division: formData.division,
         event_date: formData.event_date,
         event_time: formData.event_time,
-        is_recurring: isRecurringBoolean,
+        is_recurring: formData.is_recurring,
         recurrence_day: formData.is_recurring ? formData.recurrence_day : null,
         created_by: user.id,
       };

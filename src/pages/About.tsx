@@ -3,15 +3,6 @@ import React from 'react';
 import { Users, Target, Trophy, Star } from 'lucide-react';
 
 const About = () => {
-  const teamMembers = [
-    { name: 'Jenny Wilson', role: 'CEO, Alishka', avatar: '1' },
-    { name: 'Albert Flores', role: 'CEO, Alishka', avatar: '2' },
-    { name: 'Ronald Richards', role: 'CEO, Alishka', avatar: '3' },
-    { name: 'Devon Lane', role: 'Lead Strategist', avatar: '4' },
-    { name: 'Courtney Henry', role: 'Community Manager', avatar: '5' },
-    { name: 'Cameron Williamson', role: 'Head Coach', avatar: '6' },
-  ];
-
   return (
     <div className="min-h-screen bg-black pt-20">
       {/* Who We Are Section */}
@@ -27,9 +18,6 @@ const About = () => {
               <p className="text-gray-400 text-lg mb-8 leading-relaxed">
                 Our Mission Is Empower Teams & Players.
               </p>
-              <button className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors">
-                Know More
-              </button>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-4">
@@ -61,28 +49,17 @@ const About = () => {
         </div>
       </section>
 
-      {/* Team Section */}
+      {/* Division Heads Section */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <span className="text-red-500 font-semibold mb-4 block">The Gamers</span>
+            <span className="text-red-500 font-semibold mb-4 block">Leadership</span>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Players Behind Our Screens.
+              Division Heads
             </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {teamMembers.map((member, index) => (
-              <div key={index} className="text-center group">
-                <div className="relative mb-6 inline-block">
-                  <div className="w-32 h-32 bg-gradient-to-br from-red-600 to-orange-600 rounded-full flex items-center justify-center text-white text-2xl font-bold group-hover:scale-105 transition-transform duration-200">
-                    {member.avatar}
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-2">{member.name}</h3>
-                <p className="text-gray-400">{member.role}</p>
-              </div>
-            ))}
+            <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+              Meet the leaders who guide our gaming divisions to excellence.
+            </p>
           </div>
         </div>
       </section>
