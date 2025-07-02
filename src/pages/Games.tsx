@@ -10,6 +10,11 @@ interface TeamMember {
   username: string;
   team_number: number;
   is_captain: boolean;
+  discord?: string;
+  twitch?: string;
+  twitter?: string;
+  youtube?: string;
+  instagram?: string;
 }
 
 interface TeamSettings {
@@ -113,9 +118,21 @@ const Games = () => {
     return teamMembers.filter(member => member.division === divisionName).length;
   };
 
-  const gamesWithPlayerCount = games.map(game => ({
+  const getTeamSettingsForDivision = (divisionName: string) => {
+    return teamSettings.find(setting => setting.division === divisionName) || {
+      division: divisionName,
+      team1_max_players: 5,
+      team2_max_players: 5,
+      team1_name: 'Team 1',
+      team2_name: 'Team 2',
+    };
+  };
+
+  const gamesWithPlayerData = games.map(game => ({
     ...game,
-    playerCount: getPlayerCountForDivision(game.name)
+    playerCount: getPlayerCountForDivision(game.name),
+    teamMembers: teamMembers,
+    teamSettings: getTeamSettingsForDivision(game.name)
   }));
 
   if (loading) {
@@ -139,7 +156,7 @@ const Games = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {gamesWithPlayerCount.map((game) => (
+          {gamesWithPlayerData.map((game) => (
             <GameCard key={game.id} {...game} />
           ))}
         </div>
