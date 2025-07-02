@@ -1,9 +1,15 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, User } from 'lucide-react';
+import { Menu, X, LogOut, User, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,10 +20,17 @@ const Header = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const gameRoutes = [
+    { name: 'Apex Legends', path: '/apex-legends' },
+    { name: 'Valorant', path: '/valorant' },
+    { name: 'Call of Duty', path: '/call-of-duty' },
+    { name: 'Call of Duty Mobile', path: '/call-of-duty-mobile' },
+    { name: 'Siege X', path: '/siege-x' }
+  ];
+
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'About Us', path: '/about' },
-    { name: 'Games', path: '/games' },
     { name: 'Calendar', path: '/calendar' },
     { name: 'Players', path: '/players' },
     ...(user ? [{ name: 'Profile', path: '/profile' }] : []),
@@ -71,6 +84,26 @@ const Header = () => {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Games Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center space-x-1 text-gray-300 hover:text-white transition-colors duration-200">
+                <span>Games</span>
+                <ChevronDown size={16} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-gray-900 border-gray-700">
+                {gameRoutes.map((game) => (
+                  <DropdownMenuItem key={game.path} asChild>
+                    <Link
+                      to={game.path}
+                      className="text-gray-300 hover:text-white hover:bg-gray-800 focus:bg-gray-800 focus:text-white"
+                    >
+                      {game.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
 
           {/* Right side buttons */}
@@ -129,6 +162,22 @@ const Header = () => {
                   {item.name}
                 </Link>
               ))}
+              
+              {/* Mobile Games Links */}
+              <div className="border-t border-gray-700 pt-4">
+                <span className="text-gray-400 text-sm font-semibold mb-2 block">Games</span>
+                {gameRoutes.map((game) => (
+                  <Link
+                    key={game.path}
+                    to={game.path}
+                    className="text-gray-300 hover:text-white transition-colors duration-200 block py-1 pl-4"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {game.name}
+                  </Link>
+                ))}
+              </div>
+              
               {user ? (
                 <button
                   onClick={() => {

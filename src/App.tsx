@@ -7,8 +7,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import Header from "./components/Header";
 import Index from "./pages/Index";
-import Games from "./pages/Games";
-import GameDetail from "./pages/GameDetail";
+import ApexLegends from "./pages/ApexLegends";
+import Valorant from "./pages/Valorant";
+import CallOfDuty from "./pages/CallOfDuty";
+import CallOfDutyMobile from "./pages/CallOfDutyMobile";
+import SiegeX from "./pages/SiegeX";
 import Calendar from "./pages/Calendar";
 import About from "./pages/About";
 import Auth from "./pages/Auth";
@@ -29,8 +32,11 @@ const App = () => (
             <Header />
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/games" element={<Games />} />
-              <Route path="/games/:gameId" element={<GameDetail />} />
+              <Route path="/apex-legends" element={<ApexLegends />} />
+              <Route path="/valorant" element={<Valorant />} />
+              <Route path="/call-of-duty" element={<CallOfDuty />} />
+              <Route path="/call-of-duty-mobile" element={<CallOfDutyMobile />} />
+              <Route path="/siege-x" element={<SiegeX />} />
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/about" element={<About />} />
               <Route path="/auth" element={<Auth />} />
