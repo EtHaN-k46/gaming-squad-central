@@ -1,389 +1,288 @@
 
-import React, { useState, useEffect } from 'react';
-import { Plus, X, Edit, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Calendar, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { useUserRole } from '@/hooks/useUserRole';
-
-interface Event {
-  id: string;
-  title: string;
-  description: string | null;
-  game: string;
-  division: string | null;
-  event_date: string;
-  event_time: string;
-  is_recurring: boolean | null;
-  recurrence_day: number | null;
-}
+import { toast } from 'sonner';
 
 interface AddEventDialogProps {
   onEventAdded: () => void;
-  editingEvent?: Event | null;
-  onCancelEdit?: () => void;
 }
 
-const AddEventDialog: React.FC<AddEventDialogProps> = ({ 
-  onEventAdded, 
-  editingEvent, 
-  onCancelEdit 
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
+const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded }) => {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [game, setGame] = useState('');
+  const [division, setDivision] = useState('');
+  const [eventDate, setEventDate] = useState('');
+  const [eventTime, setEventTime] = useState('');
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrenceDay, setRecurrenceDay] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [userDivision, setUserDivision] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    game: 'Apex Legends',
-    division: '',
-    event_date: '',
-    event_time: '',
-    is_recurring: false,
-    recurrence_day: 1, // Monday by default
-  });
 
   const { user } = useAuth();
-  const { toast } = useToast();
-  const { role } = useUserRole();
 
-  const games = ['Apex Legends', 'Valorant', 'Call of Duty', 'Siege X', 'Call of Duty Mobile'];
-  const divisions = ['Apex Legends', 'Valorant', 'Call of Duty', 'Siege X', 'Call of Duty Mobile'];
-  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const games = [
+    'Apex Legends',
+    'Valorant', 
+    'Call of Duty',
+    'Siege X',
+    'Call of Duty Mobile'
+  ];
 
-  useEffect(() => {
-    if (user && role === 'division_head') {
-      fetchUserDivision();
-    }
-  }, [user, role]);
+  const divisions = games;
 
-  useEffect(() => {
-    if (editingEvent) {
-      setFormData({
-        title: editingEvent.title,
-        description: editingEvent.description || '',
-        game: editingEvent.game,
-        division: editingEvent.division || '',
-        event_date: editingEvent.event_date,
-        event_time: editingEvent.event_time,
-        is_recurring: Boolean(editingEvent.is_recurring),
-        recurrence_day: editingEvent.recurrence_day || 1,
-      });
-      setIsOpen(true);
-    }
-  }, [editingEvent]);
-
-  const fetchUserDivision = async () => {
-    if (!user) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('division')
-        .eq('user_id', user.id)
-        .eq('role', 'division_head')
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching user division:', error);
-        return;
-      }
-
-      setUserDivision(data?.division || null);
-      if (data?.division && !editingEvent) {
-        setFormData(prev => ({ ...prev, division: data.division }));
-      }
-    } catch (error) {
-      console.error('Error fetching user division:', error);
-    }
-  };
+  const weekDays = [
+    { value: 0, label: 'Sunday' },
+    { value: 1, label: 'Monday' },
+    { value: 2, label: 'Tuesday' },
+    { value: 3, label: 'Wednesday' },
+    { value: 4, label: 'Thursday' },
+    { value: 5, label: 'Friday' },
+    { value: 6, label: 'Saturday' }
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
-
-    setLoading(true);
-    try {
-      const eventData = {
-        title: formData.title,
-        description: formData.description,
-        game: formData.game,
-        division: formData.division,
-        event_date: formData.event_date,
-        event_time: formData.event_time,
-        is_recurring: formData.is_recurring,
-        recurrence_day: formData.is_recurring ? formData.recurrence_day : null,
-        created_by: user.id,
-      };
-
-      if (editingEvent) {
-        const { error } = await supabase
-          .from('events')
-          .update(eventData)
-          .eq('id', editingEvent.id);
-
-        if (error) throw error;
-
-        toast({
-          title: "Event updated successfully",
-          description: "The practice session has been updated.",
-        });
-      } else {
-        const { error } = await supabase
-          .from('events')
-          .insert(eventData);
-
-        if (error) throw error;
-
-        toast({
-          title: "Event created successfully",
-          description: "The practice session has been added to the calendar.",
-        });
-      }
-
-      setFormData({
-        title: '',
-        description: '',
-        game: 'Apex Legends',
-        division: userDivision || '',
-        event_date: '',
-        event_time: '',
-        is_recurring: false,
-        recurrence_day: 1,
-      });
-      setIsOpen(false);
-      if (onCancelEdit) onCancelEdit();
-      onEventAdded();
-    } catch (error: any) {
-      toast({
-        title: editingEvent ? "Error updating event" : "Error creating event",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+    
+    if (!user) {
+      toast.error('You must be logged in to create events');
+      return;
     }
-  };
 
-  const handleDelete = async () => {
-    if (!editingEvent || !user) return;
+    if (!title || !game || !eventDate || !eventTime) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    if (isRecurring && recurrenceDay === null) {
+      toast.error('Please select a day of the week for recurring events');
+      return;
+    }
 
     setLoading(true);
+
     try {
       const { error } = await supabase
         .from('events')
-        .delete()
-        .eq('id', editingEvent.id);
+        .insert({
+          title,
+          description: description || null,
+          game,
+          division: division || null,
+          event_date: eventDate,
+          event_time: eventTime,
+          is_recurring: isRecurring,
+          recurrence_day: isRecurring ? recurrenceDay : null,
+          created_by: user.id
+        });
 
       if (error) throw error;
 
-      toast({
-        title: "Event deleted successfully",
-        description: "The practice session has been removed from the calendar.",
-      });
-
-      setIsOpen(false);
-      if (onCancelEdit) onCancelEdit();
+      toast.success('Event created successfully!');
+      
+      // Reset form
+      setTitle('');
+      setDescription('');
+      setGame('');
+      setDivision('');
+      setEventDate('');
+      setEventTime('');
+      setIsRecurring(false);
+      setRecurrenceDay(null);
+      setOpen(false);
+      
       onEventAdded();
-    } catch (error: any) {
-      toast({
-        title: "Error deleting event",
-        description: error.message,
-        variant: "destructive",
-      });
+    } catch (error) {
+      console.error('Error creating event:', error);
+      toast.error('Failed to create event');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleClose = () => {
-    setIsOpen(false);
-    if (onCancelEdit) onCancelEdit();
+  const resetForm = () => {
+    setTitle('');
+    setDescription('');
+    setGame('');
+    setDivision('');
+    setEventDate('');
+    setEventTime('');
+    setIsRecurring(false);
+    setRecurrenceDay(null);
   };
 
-  if (!isOpen && !editingEvent) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg inline-flex items-center transition-colors"
-      >
-        <Plus size={20} className="mr-2" />
-        Add Practice Session
-      </button>
-    );
-  }
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-xl p-6 w-full max-w-md border border-gray-800 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white">
-            {editingEvent ? 'Edit Practice Session' : 'Add Practice Session'}
-          </h2>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-white"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">
-              Title
-            </label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-              placeholder="Practice session title"
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      setOpen(newOpen);
+      if (!newOpen) {
+        resetForm();
+      }
+    }}>
+      <DialogTrigger asChild>
+        <Button className="bg-red-600 hover:bg-red-700 text-white">
+          <Plus className="w-4 h-4 mr-2" />
+          Add Event
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[600px] bg-gray-900 border-gray-700">
+        <DialogHeader>
+          <DialogTitle className="text-white flex items-center">
+            <Calendar className="w-5 h-5 mr-2 text-red-500" />
+            Create New Event
+          </DialogTitle>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-white">Event Title *</Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter event title"
+              className="bg-gray-800 border-gray-600 text-white"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">
-              Game
-            </label>
-            <select
-              value={formData.game}
-              onChange={(e) => setFormData({ ...formData, game: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-              required
-            >
-              {games.map((game) => (
-                <option key={game} value={game}>
-                  {game}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">
-              Division
-            </label>
-            <select
-              value={formData.division}
-              onChange={(e) => setFormData({ ...formData, division: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-              disabled={role === 'division_head' && userDivision}
-              required
-            >
-              <option value="">Select Division</option>
-              {(role === 'admin' ? divisions : userDivision ? [userDivision] : divisions).map((division) => (
-                <option key={division} value={division}>
-                  {division}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center space-x-3 p-3 bg-gray-800/50 rounded-lg">
-            <input
-              type="checkbox"
-              id="recurring"
-              checked={formData.is_recurring}
-              onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
-              className="w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded focus:ring-red-500"
-            />
-            <label htmlFor="recurring" className="text-gray-300 text-sm">
-              Recurring weekly event
-            </label>
-          </div>
-
-          {formData.is_recurring && (
-            <div>
-              <label className="block text-gray-300 text-sm font-medium mb-2">
-                Repeat every
-              </label>
-              <select
-                value={formData.recurrence_day}
-                onChange={(e) => setFormData({ ...formData, recurrence_day: parseInt(e.target.value) })}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-              >
-                {dayNames.map((day, index) => (
-                  <option key={day} value={index}>
-                    {day}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {!formData.is_recurring && (
-            <div>
-              <label className="block text-gray-300 text-sm font-medium mb-2">
-                Date
-              </label>
-              <input
-                type="date"
-                value={formData.event_date}
-                onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-                required
-              />
-            </div>
-          )}
-
-          <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">
-              Time
-            </label>
-            <input
-              type="time"
-              value={formData.event_time}
-              onChange={(e) => setFormData({ ...formData, event_time: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-300 text-sm font-medium mb-2">
-              Description (Optional)
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-              placeholder="Additional details about the session"
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-white">Description</Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter event description (optional)"
+              className="bg-gray-800 border-gray-600 text-white"
               rows={3}
             />
           </div>
 
-          <div className="flex space-x-2 pt-4">
-            {editingEvent && (
-              <button
-                type="button"
-                onClick={handleDelete}
-                className="flex-1 bg-red-700 hover:bg-red-600 text-white py-3 px-4 rounded-lg transition-colors inline-flex items-center justify-center"
-              >
-                <Trash2 size={16} className="mr-2" />
-                Delete
-              </button>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="game" className="text-white">Game *</Label>
+              <Select value={game} onValueChange={setGame} required>
+                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                  <SelectValue placeholder="Select a game" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600">
+                  {games.map((gameOption) => (
+                    <SelectItem key={gameOption} value={gameOption} className="text-white hover:bg-gray-700">
+                      {gameOption}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="division" className="text-white">Division</Label>
+              <Select value={division} onValueChange={setDivision}>
+                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                  <SelectValue placeholder="Select division (optional)" />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600">
+                  {divisions.map((div) => (
+                    <SelectItem key={div} value={div} className="text-white hover:bg-gray-700">
+                      {div}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="eventDate" className="text-white">Date *</Label>
+              <Input
+                id="eventDate"
+                type="date"
+                value={eventDate}
+                onChange={(e) => setEventDate(e.target.value)}
+                className="bg-gray-800 border-gray-600 text-white"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="eventTime" className="text-white">Time *</Label>
+              <Input
+                id="eventTime"
+                type="time"
+                value={eventTime}
+                onChange={(e) => setEventTime(e.target.value)}
+                className="bg-gray-800 border-gray-600 text-white"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="recurring"
+                checked={isRecurring}
+                onCheckedChange={setIsRecurring}
+              />
+              <Label htmlFor="recurring" className="text-white">
+                Make this a recurring weekly event
+              </Label>
+            </div>
+
+            {isRecurring && (
+              <div className="space-y-2">
+                <Label htmlFor="recurrenceDay" className="text-white">Day of the Week *</Label>
+                <Select 
+                  value={recurrenceDay?.toString() || ''} 
+                  onValueChange={(value) => setRecurrenceDay(parseInt(value))}
+                >
+                  <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                    <SelectValue placeholder="Select day of the week" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-600">
+                    {weekDays.map((day) => (
+                      <SelectItem key={day.value} value={day.value.toString()} className="text-white hover:bg-gray-700">
+                        {day.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             )}
-            <button
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <Button
               type="button"
-              onClick={handleClose}
-              className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-lg transition-colors"
+              variant="outline"
+              onClick={() => {
+                setOpen(false);
+                resetForm();
+              }}
+              className="border-gray-600 text-gray-300 hover:bg-gray-800"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center"
+              className="bg-red-600 hover:bg-red-700 text-white"
             >
-              {editingEvent && <Edit size={16} className="mr-2" />}
-              {loading ? 'Saving...' : (editingEvent ? 'Update' : 'Create')}
-            </button>
+              {loading ? 'Creating...' : 'Create Event'}
+            </Button>
           </div>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
