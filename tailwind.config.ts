@@ -17,8 +17,18 @@ export default {
 				'2xl': '1400px'
 			}
 		},
-		extend: {
-			colors: {
+    extend: {
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-gaming': 'var(--gradient-gaming)',
+        'gradient-neon': 'var(--gradient-neon)',
+      },
+      boxShadow: {
+        'glow': 'var(--glow-primary)',
+        'gaming': 'var(--shadow-gaming)',
+        '3xl': '0 35px 60px -12px rgba(0, 0, 0, 0.6)',
+      },
+      colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
