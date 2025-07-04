@@ -15,9 +15,9 @@ const Index = () => {
     },
     {
       icon: Users,
-      title: 'Team Management',
-      description: 'Manage team rosters and player assignments across different games.',
-      link: '/games'
+      title: 'Player Profiles',
+      description: 'View comprehensive player profiles and team assignments.',
+      link: '/players'
     },
     {
       icon: Trophy,
