@@ -52,7 +52,7 @@ const Players = () => {
   });
   
   const { user } = useAuth();
-  const { role, canManageEvents } = useUserRole();
+  const { role, userDivision, canManageEvents } = useUserRole();
   const { toast } = useToast();
 
   const divisions = ['Apex Legends', 'Valorant', 'Call of Duty', 'Siege X', 'Call of Duty Mobile'];
@@ -138,7 +138,11 @@ const Players = () => {
   };
 
   const canEditDivision = (division: string) => {
-    return role === 'admin' || canManageEvents;
+    if (role === 'admin') return true;
+    if (role === 'division_head') {
+      return userDivision?.toLowerCase() === division.toLowerCase();
+    }
+    return false;
   };
 
   const addPlayer = async (division: string, teamNumber: number) => {
