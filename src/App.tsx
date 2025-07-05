@@ -17,6 +17,8 @@ import About from "./pages/About";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Players from "./pages/Players";
+import Games from "./pages/Games";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,8 @@ const App = () => (
             <Header />
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/games" element={<Games />} />
               <Route path="/apex-legends" element={<ApexLegends />} />
               <Route path="/valorant" element={<Valorant />} />
               <Route path="/call-of-duty" element={<CallOfDuty />} />

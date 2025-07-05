@@ -27,9 +27,9 @@ const Index = () => {
     },
     {
       icon: Target,
-      title: 'Player Profiles',
-      description: 'Complete player management with social media integration.',
-      link: '/profile'
+      title: 'Game Divisions',
+      description: 'Explore all our competitive gaming divisions and their teams.',
+      link: '/games'
     }
   ];
 
@@ -85,7 +85,7 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                to="/login"
+                to="/auth"
                 className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
               >
                 Join Now

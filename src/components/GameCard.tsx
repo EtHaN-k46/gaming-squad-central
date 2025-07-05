@@ -56,8 +56,19 @@ const GameCard: React.FC<GameCardProps> = ({
     'Call of Duty Mobile': 'from-purple-500 to-purple-600'
   };
 
+  const getGameRoute = (gameId: string) => {
+    const routeMap: { [key: string]: string } = {
+      'apex-legends': '/apex-legends',
+      'valorant': '/valorant',
+      'call-of-duty': '/call-of-duty',
+      'call-of-duty-mobile': '/call-of-duty-mobile',
+      'siege-x': '/siege-x'
+    };
+    return routeMap[gameId] || '/games';
+  };
+
   return (
-    <Link to={`/games/${id}`} className="group block">
+    <Link to={getGameRoute(id)} className="group block">
       <div className="bg-gray-900/50 rounded-xl overflow-hidden border border-gray-800 hover:border-red-600/50 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-red-600/10">
         <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
           {image ? (

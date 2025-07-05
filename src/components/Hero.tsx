@@ -66,16 +66,16 @@ const Hero = () => {
             {user ? (
               <>
                 <Link
-                  to="/games"
+                  to="/dashboard"
                   className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-red-600/25"
                 >
-                  Browse Games
+                  Dashboard
                 </Link>
                 <Link
-                  to="/profile"
+                  to="/games"
                   className="border border-gray-600 hover:border-gray-400 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 hover:bg-gray-800/50"
                 >
-                  My Profile
+                  Browse Games
                 </Link>
               </>
             ) : (

@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, User, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { LoadingButton } from '@/components/ui/button-loading';
+import NotificationBanner from '@/components/NotificationBanner';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -92,6 +94,14 @@ const Auth = () => {
               </p>
             </div>
 
+            {!isLogin && (
+              <NotificationBanner
+                message="After signing up, please check your email to verify your account before signing in."
+                type="info"
+                dismissible={false}
+              />
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               {!isLogin && (
                 <>
@@ -176,13 +186,14 @@ const Auth = () => {
                 </div>
               </div>
 
-              <button
+              <LoadingButton
                 type="submit"
-                disabled={loading}
-                className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                loading={loading}
+                loadingText="Please wait..."
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
               >
-                {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Sign Up')}
-              </button>
+                {isLogin ? 'Sign In' : 'Sign Up'}
+              </LoadingButton>
             </form>
 
             <div className="mt-8 text-center">

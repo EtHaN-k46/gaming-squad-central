@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { LoadingButton } from '@/components/ui/button-loading';
 
 interface ProfileData {
   id: string;
@@ -230,14 +231,15 @@ const Profile = () => {
 
                 {/* Save Button */}
                 <div className="text-center">
-                  <button
+                  <LoadingButton
                     type="submit"
-                    disabled={saving}
-                    className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold inline-flex items-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    loading={saving}
+                    loadingText="Saving..."
+                    className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold inline-flex items-center transition-colors"
                   >
                     <Save className="mr-2" size={20} />
-                    {saving ? 'Saving...' : 'Save Profile'}
-                  </button>
+                    Save Profile
+                  </LoadingButton>
                 </div>
               </form>
             </div>
