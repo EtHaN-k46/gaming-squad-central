@@ -35,6 +35,7 @@ const TeamManagement = () => {
   const [loading, setLoading] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [userDivision, setUserDivision] = useState<string | null>(null);
+  const [showDivisionSelector, setShowDivisionSelector] = useState(false);
   const [formData, setFormData] = useState({
     team_name: '',
     username: '',
@@ -71,7 +72,16 @@ const TeamManagement = () => {
   }, [userDivision]);
 
   const fetchUserDivision = async () => {
-    if (!user || role !== 'division_head') return;
+    if (!user) return;
+    
+    // If admin, set a default division or allow selecting from all divisions
+    if (role === 'admin') {
+      // For now, set to the first division for admin to manage
+      setUserDivision('Apex Legends');
+      return;
+    }
+    
+    if (role !== 'division_head') return;
     
     try {
       const { data, error } = await supabase
@@ -98,9 +108,8 @@ const TeamManagement = () => {
     try {
       let query = supabase.from('team_members').select('*');
       
-      if (role === 'division_head') {
-        query = query.eq('division', userDivision);
-      }
+      // Both admins and division heads should filter by division
+      query = query.eq('division', userDivision);
 
       const { data, error } = await query.order('username');
 
@@ -337,6 +346,27 @@ const TeamManagement = () => {
 
   return (
     <div className="mt-8">
+      {/* Admin Division Selector */}
+      {role === 'admin' && (
+        <div className="mb-6 bg-gray-900/50 rounded-xl p-4 border border-gray-800">
+          <label className="block text-gray-300 text-sm font-medium mb-2">
+            Select Division to Manage
+          </label>
+          <select
+            value={userDivision || ''}
+            onChange={(e) => setUserDivision(e.target.value)}
+            className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
+          >
+            <option value="">Select a division...</option>
+            {divisions.map((division) => (
+              <option key={division} value={division}>
+                {division}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-bold text-white flex items-center">
           <Users className="mr-2" />
