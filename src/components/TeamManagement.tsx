@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useUserRole } from '@/hooks/useUserRole';
+import { SecurityValidator } from '@/utils/security';
 
 interface TeamMember {
   id: string;
@@ -173,19 +174,51 @@ const TeamManagement = () => {
     e.preventDefault();
     if (!user || !userDivision) return;
 
+    // Validate inputs
+    if (!SecurityValidator.validateText(formData.team_name, 100)) {
+      toast({
+        title: "Invalid team name",
+        description: "Team name contains invalid characters or is too long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!SecurityValidator.validateUsername(formData.username)) {
+      toast({
+        title: "Invalid username",
+        description: "Username must be 3-30 characters and contain only letters, numbers, underscores, and hyphens.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate social media URLs if provided
+    const socialUrls = [formData.discord, formData.twitch, formData.twitter, formData.youtube, formData.instagram];
+    for (const url of socialUrls) {
+      if (url && !SecurityValidator.validateUrl(url)) {
+        toast({
+          title: "Invalid URL",
+          description: "Please enter valid URLs for social media links.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const memberData = {
         division: userDivision,
-        team_name: formData.team_name,
-        username: formData.username,
+        team_name: SecurityValidator.sanitizeInput(formData.team_name),
+        username: SecurityValidator.sanitizeInput(formData.username),
         team_number: formData.team_number,
         is_captain: formData.is_captain,
-        discord: formData.discord || null,
-        twitch: formData.twitch || null,
-        twitter: formData.twitter || null,
-        youtube: formData.youtube || null,
-        instagram: formData.instagram || null,
+        discord: formData.discord ? SecurityValidator.sanitizeInput(formData.discord) : null,
+        twitch: formData.twitch ? SecurityValidator.sanitizeInput(formData.twitch) : null,
+        twitter: formData.twitter ? SecurityValidator.sanitizeInput(formData.twitter) : null,
+        youtube: formData.youtube ? SecurityValidator.sanitizeInput(formData.youtube) : null,
+        instagram: formData.instagram ? SecurityValidator.sanitizeInput(formData.instagram) : null,
         created_by: user.id,
       };
 
@@ -486,9 +519,10 @@ const TeamManagement = () => {
                 <input
                   type="text"
                   value={formData.team_name}
-                  onChange={(e) => setFormData({ ...formData, team_name: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, team_name: SecurityValidator.sanitizeInput(e.target.value) })}
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                   placeholder="e.g., Alpha Squad, Team Red"
+                  maxLength={100}
                   required
                 />
               </div>

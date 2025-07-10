@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingButton } from '@/components/ui/button-loading';
 import NotificationBanner from '@/components/NotificationBanner';
+import { SecurityValidator, RateLimiter, cleanupAuthState } from '@/utils/security';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -16,8 +17,9 @@ const Auth = () => {
   const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
+  const [csrfToken, setCsrfToken] = useState('');
   
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, signOut, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -25,15 +27,78 @@ const Auth = () => {
     if (user) {
       navigate('/');
     }
+    // Generate CSRF token
+    setCsrfToken(SecurityValidator.generateCSRFToken());
   }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Rate limiting check
+    const clientId = `${navigator.userAgent}_${window.location.hostname}`;
+    if (RateLimiter.isRateLimited(clientId, 5, 15 * 60 * 1000)) {
+      toast({
+        title: "Too many attempts",
+        description: "Please wait 15 minutes before trying again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Input validation
+    if (!SecurityValidator.validateEmail(email)) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isLogin) {
+      const passwordValidation = SecurityValidator.validatePassword(password);
+      if (!passwordValidation.isValid) {
+        toast({
+          title: "Weak password",
+          description: passwordValidation.errors.join(', '),
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!SecurityValidator.validateUsername(username)) {
+        toast({
+          title: "Invalid username",
+          description: "Username must be 3-30 characters and contain only letters, numbers, underscores, and hyphens.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!SecurityValidator.validateText(firstName, 50) || !SecurityValidator.validateText(lastName, 50)) {
+        toast({
+          title: "Invalid name",
+          description: "Names must contain only letters, numbers, and basic punctuation.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
+      // Clean up existing auth state before signing in
+      cleanupAuthState();
+      
+      // Attempt global sign out to clear any existing sessions
+      try {
+        await signOut();
+      } catch (err) {
+        // Continue even if this fails
+      }
       if (isLogin) {
-        const { error } = await signIn(email, password);
+        const { error } = await signIn(SecurityValidator.sanitizeInput(email), password);
         if (error) {
           toast({
             title: "Error signing in",
@@ -41,17 +106,19 @@ const Auth = () => {
             variant: "destructive",
           });
         } else {
+          RateLimiter.clearAttempts(clientId); // Clear rate limit on success
           toast({
             title: "Welcome back!",
             description: "You have been signed in successfully.",
           });
-          navigate('/');
+          // Force page reload for security
+          window.location.href = '/';
         }
       } else {
-        const { error } = await signUp(email, password, {
-          first_name: firstName,
-          last_name: lastName,
-          username: username,
+        const { error } = await signUp(SecurityValidator.sanitizeInput(email), password, {
+          first_name: SecurityValidator.sanitizeInput(firstName),
+          last_name: SecurityValidator.sanitizeInput(lastName),
+          username: SecurityValidator.sanitizeInput(username),
         });
         if (error) {
           toast({
@@ -60,6 +127,7 @@ const Auth = () => {
             variant: "destructive",
           });
         } else {
+          RateLimiter.clearAttempts(clientId); // Clear rate limit on success
           toast({
             title: "Account created!",
             description: "Please check your email to verify your account.",
@@ -103,6 +171,7 @@ const Auth = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              <input type="hidden" name="csrf_token" value={csrfToken} />
               {!isLogin && (
                 <>
                   <div className="grid grid-cols-2 gap-4">
@@ -113,9 +182,10 @@ const Auth = () => {
                       <input
                         type="text"
                         value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
+                        onChange={(e) => setFirstName(SecurityValidator.sanitizeInput(e.target.value))}
                         className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                         placeholder="John"
+                        maxLength={50}
                         required
                       />
                     </div>
@@ -126,9 +196,10 @@ const Auth = () => {
                       <input
                         type="text"
                         value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
+                        onChange={(e) => setLastName(SecurityValidator.sanitizeInput(e.target.value))}
                         className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                         placeholder="Doe"
+                        maxLength={50}
                         required
                       />
                     </div>
@@ -140,9 +211,12 @@ const Auth = () => {
                     <input
                       type="text"
                       value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      onChange={(e) => setUsername(SecurityValidator.sanitizeInput(e.target.value))}
                       className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                       placeholder="gamerpro123"
+                      maxLength={30}
+                      pattern="[a-zA-Z0-9_-]{3,30}"
+                      title="Username must be 3-30 characters and contain only letters, numbers, underscores, and hyphens"
                       required
                     />
                   </div>
@@ -156,9 +230,11 @@ const Auth = () => {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(SecurityValidator.sanitizeInput(e.target.value))}
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                   placeholder="Enter your email"
+                  maxLength={254}
+                  autoComplete="email"
                   required
                 />
               </div>
@@ -174,6 +250,9 @@ const Auth = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 pr-12"
                     placeholder="Enter your password"
+                    minLength={8}
+                    maxLength={128}
+                    autoComplete={isLogin ? "current-password" : "new-password"}
                     required
                   />
                   <button

@@ -11,6 +11,7 @@ import { Calendar, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { SecurityValidator } from '@/utils/security';
 
 interface Event {
   id: string;
@@ -92,6 +93,17 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
       return;
     }
 
+    // Validate inputs
+    if (!SecurityValidator.validateText(title, 200)) {
+      toast.error('Event title contains invalid characters or is too long');
+      return;
+    }
+
+    if (description && !SecurityValidator.validateText(description, 1000)) {
+      toast.error('Event description contains invalid characters or is too long');
+      return;
+    }
+
     if (isRecurring && recurrenceDay === null) {
       toast.error('Please select a day of the week for recurring events');
       return;
@@ -105,10 +117,10 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
         const { error } = await supabase
           .from('events')
           .update({
-            title,
-            description: description || null,
-            game,
-            division: division || null,
+            title: SecurityValidator.sanitizeInput(title),
+            description: description ? SecurityValidator.sanitizeInput(description) : null,
+            game: SecurityValidator.sanitizeInput(game),
+            division: division ? SecurityValidator.sanitizeInput(division) : null,
             event_date: eventDate,
             event_time: eventTime,
             is_recurring: isRecurring,
@@ -124,10 +136,10 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
         const { error } = await supabase
           .from('events')
           .insert({
-            title,
-            description: description || null,
-            game,
-            division: division || null,
+            title: SecurityValidator.sanitizeInput(title),
+            description: description ? SecurityValidator.sanitizeInput(description) : null,
+            game: SecurityValidator.sanitizeInput(game),
+            division: division ? SecurityValidator.sanitizeInput(division) : null,
             event_date: eventDate,
             event_time: eventTime,
             is_recurring: isRecurring,
@@ -203,9 +215,10 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
             <Input
               id="title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => setTitle(SecurityValidator.sanitizeInput(e.target.value))}
               placeholder="Enter event title"
               className="bg-gray-800 border-gray-600 text-white"
+              maxLength={200}
               required
             />
           </div>
@@ -215,9 +228,10 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
             <Textarea
               id="description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => setDescription(SecurityValidator.sanitizeInput(e.target.value))}
               placeholder="Enter event description (optional)"
               className="bg-gray-800 border-gray-600 text-white"
+              maxLength={1000}
               rows={3}
             />
           </div>

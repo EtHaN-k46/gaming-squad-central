@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { cleanupAuthState } from '@/utils/security';
 
 interface AuthContextType {
   user: User | null;
@@ -28,16 +29,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Handle sign out event
+        if (event === 'SIGNED_OUT') {
+          cleanupAuthState();
+        }
       }
     );
 
-    // Get initial session
+    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
@@ -70,7 +76,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      // Clean up auth state first
+      cleanupAuthState();
+      
+      // Attempt global sign out
+      await supabase.auth.signOut({ scope: 'global' });
+      
+      // Force page reload for clean state
+      window.location.href = '/auth';
+    } catch (error) {
+      // Even if sign out fails, redirect to auth page
+      window.location.href = '/auth';
+    }
   };
 
   const value = {
