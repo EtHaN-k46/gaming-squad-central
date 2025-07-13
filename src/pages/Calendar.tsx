@@ -294,6 +294,7 @@ const Calendar = () => {
           event={selectedEvent}
           onClose={() => setSelectedEvent(null)}
           onEdit={handleEditEvent}
+          onDelete={fetchEvents}
           canEdit={canManageEvents}
         />
       </div>

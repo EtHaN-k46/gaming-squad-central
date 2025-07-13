@@ -1,6 +1,8 @@
 
-import React from 'react';
-import { X, Clock, Calendar, Users, GamepadIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Clock, Calendar, Users, GamepadIcon, Trash2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 interface Event {
   id: string;
@@ -18,6 +20,7 @@ interface EventDetailsModalProps {
   event: Event | null;
   onClose: () => void;
   onEdit?: (event: Event) => void;
+  onDelete?: () => void;
   canEdit?: boolean;
 }
 
@@ -25,8 +28,11 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
   event,
   onClose,
   onEdit,
+  onDelete,
   canEdit = false
 }) => {
+  const [deleting, setDeleting] = useState(false);
+  
   if (!event) return null;
 
   const formatDate = (dateString: string) => {
@@ -53,6 +59,31 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
   const getDayName = (dayNumber: number) => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return days[dayNumber];
+  };
+
+  const handleDelete = async () => {
+    if (!event) return;
+    
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', event.id);
+
+      if (error) throw error;
+      
+      toast.success('Event deleted successfully!');
+      onClose();
+      if (onDelete) {
+        onDelete();
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      toast.error('Failed to delete event');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const gameColors = {
@@ -141,9 +172,19 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
             {canEdit && onEdit && (
               <button
                 onClick={() => onEdit(event)}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg transition-colors"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors"
               >
                 Edit Event
+              </button>
+            )}
+            {canEdit && (
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg transition-colors disabled:opacity-50"
+              >
+                <Trash2 size={16} className="mr-2" />
+                {deleting ? 'Deleting...' : 'Delete'}
               </button>
             )}
           </div>
