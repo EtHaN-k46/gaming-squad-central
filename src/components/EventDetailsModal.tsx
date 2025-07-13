@@ -66,14 +66,20 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
     
     setDeleting(true);
     try {
+      // For recurring events, make sure we use the original event ID
+      const eventId = event.id.includes('-') ? event.id.split('-')[0] : event.id;
+      
+      console.log('Deleting event with ID:', eventId, 'Original event:', event);
+      
       const { error } = await supabase
         .from('events')
         .delete()
-        .eq('id', event.id);
+        .eq('id', eventId);
 
       if (error) throw error;
       
-      toast.success('Event deleted successfully!');
+      const eventType = event.is_recurring ? 'recurring event' : 'event';
+      toast.success(`${eventType.charAt(0).toUpperCase() + eventType.slice(1)} deleted successfully!`);
       onClose();
       if (onDelete) {
         onDelete();

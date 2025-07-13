@@ -113,7 +113,20 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
 
     try {
       if (editingEvent) {
-        // Update existing event
+        // Update existing event - make sure we use the original event ID for recurring events
+        const eventId = editingEvent.id.includes('-') ? editingEvent.id.split('-')[0] : editingEvent.id;
+        
+        console.log('Updating event with ID:', eventId, 'Data:', {
+          title,
+          description,
+          game,
+          division,
+          event_date: eventDate,
+          event_time: eventTime,
+          is_recurring: isRecurring,
+          recurrence_day: isRecurring ? recurrenceDay : null
+        });
+        
         const { error } = await supabase
           .from('events')
           .update({
@@ -127,10 +140,12 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
             recurrence_day: isRecurring ? recurrenceDay : null,
             updated_at: new Date().toISOString()
           })
-          .eq('id', editingEvent.id);
+          .eq('id', eventId);
 
         if (error) throw error;
-        toast.success('Event updated successfully!');
+        
+        const eventType = isRecurring ? 'recurring event' : 'event';
+        toast.success(`${eventType.charAt(0).toUpperCase() + eventType.slice(1)} updated successfully!`);
       } else {
         // Create new event
         const { error } = await supabase
