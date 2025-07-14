@@ -93,14 +93,20 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
       return;
     }
 
-    // Validate inputs
-    if (!SecurityValidator.validateText(title, 200)) {
-      toast.error('Event title contains invalid characters or is too long');
+    // More lenient validation - just check for basic safety and length
+    if (title.length > 200) {
+      toast.error('Event title is too long (max 200 characters)');
       return;
     }
 
-    if (description && !SecurityValidator.validateText(description, 1000)) {
-      toast.error('Event description contains invalid characters or is too long');
+    if (description && description.length > 1000) {
+      toast.error('Event description is too long (max 1000 characters)');
+      return;
+    }
+
+    // Basic XSS prevention
+    if (title.includes('<script') || (description && description.includes('<script'))) {
+      toast.error('Invalid characters detected in input');
       return;
     }
 
@@ -108,6 +114,8 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
       toast.error('Please select a day of the week for recurring events');
       return;
     }
+
+    console.log('Validation passed, proceeding with save...');
 
     setLoading(true);
 
@@ -130,10 +138,10 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
         const { error } = await supabase
           .from('events')
           .update({
-            title: SecurityValidator.sanitizeInput(title),
-            description: description ? SecurityValidator.sanitizeInput(description) : null,
-            game: SecurityValidator.sanitizeInput(game),
-            division: division ? SecurityValidator.sanitizeInput(division) : null,
+            title: title.trim(),
+            description: description ? description.trim() : null,
+            game: game.trim(),
+            division: division ? division.trim() : null,
             event_date: eventDate,
             event_time: eventTime,
             is_recurring: isRecurring,
@@ -154,10 +162,10 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
         const { error } = await supabase
           .from('events')
           .insert({
-            title: SecurityValidator.sanitizeInput(title),
-            description: description ? SecurityValidator.sanitizeInput(description) : null,
-            game: SecurityValidator.sanitizeInput(game),
-            division: division ? SecurityValidator.sanitizeInput(division) : null,
+            title: title.trim(),
+            description: description ? description.trim() : null,
+            game: game.trim(),
+            division: division ? division.trim() : null,
             event_date: eventDate,
             event_time: eventTime,
             is_recurring: isRecurring,
@@ -181,7 +189,21 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
       onEventAdded();
     } catch (error) {
       console.error('Error saving event:', error);
-      toast.error(`Failed to ${editingEvent ? 'update' : 'create'} event`);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : null,
+        eventData: {
+          editingEvent,
+          title,
+          game,
+          division,
+          eventDate,
+          eventTime,
+          isRecurring,
+          recurrenceDay
+        }
+      });
+      toast.error(`Failed to ${editingEvent ? 'update' : 'create'} event: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -233,7 +255,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
             <Input
               id="title"
               value={title}
-              onChange={(e) => setTitle(SecurityValidator.sanitizeInput(e.target.value))}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter event title"
               className="bg-gray-800 border-gray-600 text-white"
               maxLength={200}
@@ -246,7 +268,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
             <Textarea
               id="description"
               value={description}
-              onChange={(e) => setDescription(SecurityValidator.sanitizeInput(e.target.value))}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="Enter event description (optional)"
               className="bg-gray-800 border-gray-600 text-white"
               maxLength={1000}
