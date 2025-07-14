@@ -72,10 +72,16 @@ const Calendar = () => {
         const currentDate = new Date(startOfMonth);
         while (currentDate <= endOfMonth) {
           if (currentDate.getDay() === event.recurrence_day) {
+            // Format date consistently
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
+            
             allEvents.push({
               ...event,
-              id: `${event.id}-${currentDate.toISOString().split('T')[0]}`,
-              event_date: currentDate.toISOString().split('T')[0]
+              id: `${event.id}-${formattedDate}`,
+              event_date: formattedDate
             });
           }
           currentDate.setDate(currentDate.getDate() + 1);
@@ -86,6 +92,7 @@ const Calendar = () => {
       }
     });
 
+    console.log('Generated events:', allEvents);
     return allEvents;
   };
 
@@ -126,15 +133,26 @@ const Calendar = () => {
   };
 
   const handleEventClick = (event: Event) => {
-    // If it's a recurring event with a generated ID, find the original event
-    const originalEvent = events.find(e => e.id === event.id.split('-')[0]) || event;
-    setSelectedEvent(originalEvent);
+    console.log('Event clicked:', event);
+    setSelectedEvent(event);
   };
 
   const handleEditEvent = (event: Event) => {
-    const originalEvent = events.find(e => e.id === event.id.split('-')[0]) || event;
+    console.log('Event edit clicked:', event);
     setSelectedEvent(null);
-    setEditingEvent(originalEvent);
+    setEditingEvent(event);
+  };
+
+  const handleEventUpdated = () => {
+    console.log('Event updated, refreshing calendar...');
+    fetchEvents();
+    setEditingEvent(null);
+  };
+
+  const handleEventDeleted = () => {
+    console.log('Event deleted, refreshing calendar...');
+    fetchEvents();
+    setSelectedEvent(null);
   };
 
   const daysInMonth = getDaysInMonth(currentDate);
@@ -270,7 +288,7 @@ const Calendar = () => {
           {user && canManageEvents && (
             <div className="mt-6 text-center">
               <AddEventDialog 
-                onEventAdded={fetchEvents} 
+                onEventAdded={handleEventUpdated} 
                 editingEvent={editingEvent}
                 onCancelEdit={() => setEditingEvent(null)}
               />
@@ -294,7 +312,7 @@ const Calendar = () => {
           event={selectedEvent}
           onClose={() => setSelectedEvent(null)}
           onEdit={handleEditEvent}
-          onDelete={fetchEvents}
+          onDelete={handleEventDeleted}
           canEdit={canManageEvents}
         />
       </div>

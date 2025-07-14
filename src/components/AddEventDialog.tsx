@@ -142,7 +142,10 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onEventAdded, editingEv
           })
           .eq('id', eventId);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
         
         const eventType = isRecurring ? 'recurring event' : 'event';
         toast.success(`${eventType.charAt(0).toUpperCase() + eventType.slice(1)} updated successfully!`);

@@ -76,14 +76,19 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
         .delete()
         .eq('id', eventId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
       
       const eventType = event.is_recurring ? 'recurring event' : 'event';
       toast.success(`${eventType.charAt(0).toUpperCase() + eventType.slice(1)} deleted successfully!`);
-      onClose();
+      
+      // Call onDelete to refresh the calendar
       if (onDelete) {
         onDelete();
       }
+      onClose();
     } catch (error) {
       console.error('Error deleting event:', error);
       toast.error('Failed to delete event');
