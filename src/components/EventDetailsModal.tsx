@@ -66,10 +66,19 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
     
     setDeleting(true);
     try {
-      // For recurring events, make sure we use the original event ID
-      const eventId = event.id.includes('-') ? event.id.split('-')[0] : event.id;
+      // Extract the original event ID - for recurring events, remove the date suffix
+      let eventId = event.id;
+      if (event.id.includes('-') && event.is_recurring) {
+        // For recurring events with synthetic IDs like "uuid-2025-07-15"
+        eventId = event.id.split('-').slice(0, -3).join('-'); // Remove last 3 parts (year-month-day)
+      }
       
-      console.log('Deleting event with ID:', eventId, 'Original event:', event);
+      console.log('Attempting to delete event:', {
+        originalEventId: event.id,
+        extractedEventId: eventId,
+        isRecurring: event.is_recurring,
+        eventTitle: event.title
+      });
       
       const { error } = await supabase
         .from('events')
@@ -77,9 +86,11 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
         .eq('id', eventId);
 
       if (error) {
-        console.error('Delete error:', error);
+        console.error('Supabase delete error:', error);
         throw error;
       }
+      
+      console.log('Event deleted successfully');
       
       const eventType = event.is_recurring ? 'recurring event' : 'event';
       toast.success(`${eventType.charAt(0).toUpperCase() + eventType.slice(1)} deleted successfully!`);
@@ -89,9 +100,23 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
         onDelete();
       }
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting event:', error);
-      toast.error('Failed to delete event');
+      console.error('Delete error details:', {
+        message: error?.message,
+        code: error?.code,
+        details: error?.details,
+        hint: error?.hint,
+        eventId: event.id,
+        isRecurring: event.is_recurring
+      });
+      
+      let errorMessage = 'Failed to delete event';
+      if (error?.message) {
+        errorMessage += `: ${error.message}`;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setDeleting(false);
     }
