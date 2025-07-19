@@ -147,7 +147,6 @@ const Profile = () => {
                     userId={user.id}
                     currentAvatarUrl={profile.avatar_url}
                     onAvatarUpdate={handleAvatarUpdate}
-                    username={profile.username || profile.first_name || 'User'}
                   />
                   <h3 className="text-xl font-bold text-white mt-4">{profile.username || 'Set username'}</h3>
                   <p className="text-gray-400">{user.email}</p>
