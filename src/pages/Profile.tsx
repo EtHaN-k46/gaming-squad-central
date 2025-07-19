@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Twitter, Twitch, Youtube, Save } from 'lucide-react';
+import { User, Save } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { LoadingButton } from '@/components/ui/button-loading';
+import { AvatarUpload } from '@/components/AvatarUpload';
 
 interface ProfileData {
   id: string;
@@ -74,6 +75,10 @@ const Profile = () => {
     setProfile(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleAvatarUpdate = (url: string) => {
+    setProfile(prev => ({ ...prev, avatar_url: url }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -138,10 +143,13 @@ const Profile = () => {
             <div className="lg:col-span-1">
               <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-800 sticky top-24">
                 <div className="text-center mb-6">
-                  <div className="w-24 h-24 bg-gradient-to-br from-red-600 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <User className="text-white" size={32} />
-                  </div>
-                  <h3 className="text-xl font-bold text-white">{profile.username || 'Set username'}</h3>
+                  <AvatarUpload
+                    userId={user.id}
+                    currentAvatarUrl={profile.avatar_url}
+                    onAvatarUpdate={handleAvatarUpdate}
+                    username={profile.username || profile.first_name || 'User'}
+                  />
+                  <h3 className="text-xl font-bold text-white mt-4">{profile.username || 'Set username'}</h3>
                   <p className="text-gray-400">{user.email}</p>
                 </div>
 
