@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Hero from '../components/Hero';
 import StatsSection from '../components/StatsSection';
@@ -72,8 +71,38 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Discord Community Section */}
       <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Join Our 
+              <span className="text-red-500"> Gaming Community</span>
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Connect with fellow gamers, find teammates, and stay updated with the latest announcements on our Discord server.
+            </p>
+          </div>
+          
+          <div className="flex justify-center">
+            <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
+              <iframe 
+                src="https://ptb.discord.com/widget?id=819994053759860746&theme=dark" 
+                width="350" 
+                height="500" 
+                allowTransparency={true}
+                frameBorder="0" 
+                sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+                className="rounded-lg"
+                title="Discord Server Widget"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-b from-black to-gray-900">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
