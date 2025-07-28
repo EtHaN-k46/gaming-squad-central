@@ -71,34 +71,26 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Discord Server Widget Section */}
+{/* Discord CTA Button Section */}
 <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
-  <div className="container mx-auto px-4">
-    <div className="text-center mb-16">
-      <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-        Join Our 
-        <span className="text-red-500"> Discord Server</span>
-      </h2>
-      <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-        Instantly connect with our gaming community through our public Discord server.
-      </p>
-    </div>
-
-    <div className="flex justify-center">
-      <div className="w-full max-w-md bg-gray-900/50 rounded-xl p-4 sm:p-6 border border-gray-800">
-        <iframe
-          src="https://discord.com/widget?id=819994053759860746&theme=dark"
-          className="w-full h-[500px] rounded-lg"
-          allowTransparency={true}
-          frameBorder="0"
-          sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
-          title="Discord Server Widget"
-        />
-      </div>
-    </div>
+  <div className="container mx-auto px-4 text-center">
+    <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+      Join Our <span className="text-red-500">Discord Server</span>
+    </h2>
+    <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
+      Instantly connect with our community and stay updated with events, scrims, and announcements.
+    </p>
+    <a
+      href="https://discord.com/invite/819994053759860746"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg transition duration-300 text-lg"
+    >
+      <Discord className="w-6 h-6" />
+      Join Our Discord
+    </a>
   </div>
 </section>
-
 
 
       {/* CTA Section */}
