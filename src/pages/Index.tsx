@@ -3,7 +3,7 @@ import Hero from '../components/Hero';
 import StatsSection from '../components/StatsSection';
 import { Link } from 'react-router-dom';
 import { Calendar, Users, Trophy, Target } from 'lucide-react';
-
+import { Discord } from 'lucide-react';
 const Index = () => {
   const features = [
     {
