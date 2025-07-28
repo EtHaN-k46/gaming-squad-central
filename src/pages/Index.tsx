@@ -87,7 +87,7 @@ const Index = () => {
     <div className="flex justify-center">
       <div className="w-full max-w-md bg-gray-900/50 rounded-xl p-4 sm:p-6 border border-gray-800">
         <iframe
-          src="https://ptb.discord.com/api/guilds/819994053759860746/widget.json"
+          src="https://discord.com/widget?id=819994053759860746&theme=dark"
           className="w-full h-[500px] rounded-lg"
           allowTransparency={true}
           frameBorder="0"
