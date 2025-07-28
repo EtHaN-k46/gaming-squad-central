@@ -71,35 +71,34 @@ const Index = () => {
         </div>
       </section>
 
-        {/* Discord Server Widget Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-black">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Join Our 
-              <span className="text-red-500"> Discord Server</span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Instantly connect with our gaming community through our public Discord server.
-            </p>
-          </div>
-      
-          <div className="flex justify-center">
-            <div className="w-full max-w-md bg-gray-900/50 rounded-xl p-4 sm:p-6 border border-gray-800">
-              <div className="relative" style={{ paddingBottom: '140%', height: 0, overflow: 'hidden' }}>
-                <iframe
-                  src="https://ptb.discord.com/widget?id=819994053759860746&theme=dark"
-                  className="absolute top-0 left-0 w-full h-full rounded-lg"
-                  allowTransparency={true}
-                  frameBorder="0"
-                  sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
-                  title="Discord Server Widget"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Discord Server Widget Section */}
+<section className="py-20 bg-gradient-to-b from-gray-900 to-black">
+  <div className="container mx-auto px-4">
+    <div className="text-center mb-16">
+      <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+        Join Our 
+        <span className="text-red-500"> Discord Server</span>
+      </h2>
+      <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+        Instantly connect with our gaming community through our public Discord server.
+      </p>
+    </div>
+
+    <div className="flex justify-center">
+      <div className="w-full max-w-md bg-gray-900/50 rounded-xl p-4 sm:p-6 border border-gray-800">
+        <iframe
+          src="https://discord.com/widget?id=819994053759860746&theme=dark"
+          className="w-full h-[500px] rounded-lg"
+          allowTransparency={true}
+          frameBorder="0"
+          sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+          title="Discord Server Widget"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
 
 
       {/* CTA Section */}
