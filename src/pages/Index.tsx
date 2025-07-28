@@ -81,7 +81,7 @@ const Index = () => {
       Instantly connect with our community and stay updated with events, scrims, and announcements.
     </p>
     <a
-      href="https://discord.com/invite/819994053759860746" // ✅ Replace with your actual invite if needed
+      href="https://discord.gg/p38PeNGh" // ✅ Replace with your actual invite if needed
       target="_blank"
       rel="noopener noreferrer"
       className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg transition duration-300 text-lg"
