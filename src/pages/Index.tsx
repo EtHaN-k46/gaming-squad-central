@@ -3,7 +3,7 @@ import Hero from '../components/Hero';
 import StatsSection from '../components/StatsSection';
 import { Link } from 'react-router-dom';
 import { Calendar, Users, Trophy, Target } from 'lucide-react';
-import { Discord } from 'lucide-react';
+
 const Index = () => {
   const features = [
     {
@@ -81,16 +81,16 @@ const Index = () => {
       Instantly connect with our community and stay updated with events, scrims, and announcements.
     </p>
     <a
-      href="https://discord.com/invite/819994053759860746"
+      href="https://discord.com/invite/819994053759860746" // ✅ Replace with your actual invite if needed
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg transition duration-300 text-lg"
+      className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold py-4 px-8 rounded-xl shadow-lg transition duration-300 text-lg"
     >
-      <Discord className="w-6 h-6" />
       Join Our Discord
     </a>
   </div>
 </section>
+
 
 
       {/* CTA Section */}
