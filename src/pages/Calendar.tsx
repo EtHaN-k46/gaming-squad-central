@@ -225,26 +225,26 @@ const Calendar = () => {
                       return (
                         <div
                           key={day}
-                          className={`h-32 p-2 border border-gray-700 rounded-lg hover:border-gray-600 transition-colors ${
+                          className={`min-h-32 max-h-48 p-2 border border-gray-700 rounded-lg hover:border-gray-600 transition-colors ${
                             isToday ? 'bg-red-600/10 border-red-600/50' : 'bg-gray-800/30'
-                          }`}
+                          } ${dayEvents.length > 3 ? 'h-auto' : 'h-32'}`}
                         >
                           <div className={`text-sm font-semibold mb-2 ${isToday ? 'text-red-500' : 'text-white'}`}>
                             {day}
                           </div>
-                          <div className="space-y-1 overflow-hidden">
-                            {dayEvents.slice(0, 3).map((event, eventIndex) => (
+                          <div className="space-y-1 overflow-y-auto max-h-36">
+                            {dayEvents.map((event, eventIndex) => (
                               <div
                                 key={eventIndex}
                                 className={`text-xs px-2 py-1 rounded text-white cursor-pointer hover:opacity-80 transition-opacity ${
                                   gameColors[event.game as keyof typeof gameColors] || 'bg-gray-600'
-                                }`}
+                                } flex-shrink-0`}
                                 onClick={() => handleEventClick(event)}
                                 title={`${event.title} - ${formatTime(event.event_time)} ${event.division ? `(${event.division})` : ''}`}
                               >
                                 <div className="font-medium truncate">{formatTime(event.event_time)}</div>
                                 {event.division && (
-                                  <div className="truncate opacity-90">{event.division}</div>
+                                  <div className="truncate opacity-90 text-xs">{event.division}</div>
                                 )}
                                 {canManageEvents && (
                                   <Edit 
@@ -258,9 +258,6 @@ const Calendar = () => {
                                 )}
                               </div>
                             ))}
-                            {dayEvents.length > 3 && (
-                              <div className="text-xs text-gray-400 px-2">+{dayEvents.length - 3} more</div>
-                            )}
                           </div>
                         </div>
                       );

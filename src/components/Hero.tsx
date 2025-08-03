@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import TextType from './TextType';
 
 const Hero = () => {
   const { user } = useAuth();
@@ -38,18 +39,26 @@ const Hero = () => {
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
             {user ? (
               <>
-                Welcome Back to 
-                <span className="block text-transparent bg-gradient-to-r from-red-500 to-red-600 bg-clip-text">
-                  Nitara Gaming
-                </span>
+                <TextType 
+                  text={["Welcome Back to Nitara Gaming"]}
+                  typingSpeed={75}
+                  pauseDuration={1500}
+                  showCursor={true}
+                  cursorCharacter="|"
+                  loop={false}
+                  className="text-transparent bg-gradient-to-r from-red-500 to-red-600 bg-clip-text"
+                />
               </>
             ) : (
               <>
-                The Ultimate 
-                <span className="block text-transparent bg-gradient-to-r from-red-500 to-red-600 bg-clip-text">
-                  E-Sports Experience
-                </span>
-                <span className="block">Starts Here.</span>
+                <TextType 
+                  text={["Welcome to Nitara Gaming", "The ultimate esports experience starts here"]}
+                  typingSpeed={75}
+                  pauseDuration={1500}
+                  showCursor={true}
+                  cursorCharacter="|"
+                  className="text-transparent bg-gradient-to-r from-red-500 to-red-600 bg-clip-text"
+                />
               </>
             )}
           </h1>
