@@ -8,11 +8,11 @@ const Hero = () => {
   const { user } = useAuth();
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-black via-gray-900 to-black flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen bg-background dark:bg-gradient-to-br dark:from-background dark:via-muted dark:to-background flex items-center justify-center overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
-          backgroundImage: `linear-gradient(45deg, transparent 40%, rgba(220, 38, 38, 0.1) 50%, transparent 60%)`,
+          backgroundImage: `linear-gradient(45deg, transparent 40%, hsl(var(--destructive) / 0.1) 50%, transparent 60%)`,
           backgroundSize: '60px 60px',
           animation: 'pulse 4s ease-in-out infinite alternate'
         }}></div>
@@ -20,13 +20,13 @@ const Hero = () => {
 
       {/* Team Image Background */}
       <div className="absolute inset-0 flex items-center justify-end pr-20 opacity-80">
-        <div className="w-3/5 h-4/5 bg-gradient-to-l from-transparent via-gray-800/20 to-black/40 rounded-lg relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
+        <div className="w-3/5 h-4/5 bg-gradient-to-l from-transparent via-muted/20 to-background/40 rounded-lg relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-transparent"></div>
           {/* Placeholder for team image */}
-          <div className="w-full h-full bg-gray-800/30 flex items-center justify-center">
+          <div className="w-full h-full bg-muted/30 flex items-center justify-center">
             <div className="grid grid-cols-5 gap-4 opacity-60">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="w-16 h-20 bg-gray-700/50 rounded-lg"></div>
+                <div key={i} className="w-16 h-20 bg-border/50 rounded-lg"></div>
               ))}
             </div>
           </div>
@@ -36,7 +36,7 @@ const Hero = () => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-bold text-foreground mb-6 leading-tight">
             {user ? (
               <>
                 <TextType 
@@ -46,7 +46,7 @@ const Hero = () => {
                   showCursor={true}
                   cursorCharacter="|"
                   loop={false}
-                  className="text-transparent bg-gradient-to-r from-red-500 to-red-600 bg-clip-text"
+                  className="text-transparent bg-gradient-to-r from-destructive to-destructive/80 bg-clip-text"
                 />
               </>
             ) : (
@@ -57,13 +57,13 @@ const Hero = () => {
                   pauseDuration={1500}
                   showCursor={true}
                   cursorCharacter="|"
-                  className="text-transparent bg-gradient-to-r from-red-500 to-red-600 bg-clip-text"
+                  className="text-transparent bg-gradient-to-r from-destructive to-destructive/80 bg-clip-text"
                 />
               </>
             )}
           </h1>
           
-          <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
             {user ? (
               "Ready to dominate the gaming arena? Check out the latest games and join your next tournament."
             ) : (
@@ -76,13 +76,13 @@ const Hero = () => {
               <>
                 <Link
                   to="/dashboard"
-                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-red-600/25"
+                  className="bg-destructive hover:bg-destructive/90 text-destructive-foreground px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-destructive/25"
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/games"
-                  className="border border-gray-600 hover:border-gray-400 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 hover:bg-gray-800/50"
+                  className="border border-border hover:border-muted-foreground text-foreground px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 hover:bg-muted/50"
                 >
                   Browse Games
                 </Link>
@@ -91,13 +91,13 @@ const Hero = () => {
               <>
                 <Link
                   to="/auth"
-                  className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-red-600/25"
+                  className="bg-destructive hover:bg-destructive/90 text-destructive-foreground px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-destructive/25"
                 >
                   Get Started
                 </Link>
                 <Link
                   to="/about"
-                  className="border border-gray-600 hover:border-gray-400 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 hover:bg-gray-800/50"
+                  className="border border-border hover:border-muted-foreground text-foreground px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 hover:bg-muted/50"
                 >
                   Know More
                 </Link>
@@ -108,9 +108,9 @@ const Hero = () => {
       </div>
 
       {/* Animated elements */}
-      <div className="absolute top-20 left-20 w-2 h-2 bg-red-500 rounded-full animate-pulse opacity-60"></div>
-      <div className="absolute bottom-32 left-32 w-1 h-1 bg-red-400 rounded-full animate-pulse opacity-40"></div>
-      <div className="absolute top-40 right-40 w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse opacity-50"></div>
+      <div className="absolute top-20 left-20 w-2 h-2 bg-destructive rounded-full animate-pulse opacity-60"></div>
+      <div className="absolute bottom-32 left-32 w-1 h-1 bg-destructive/80 rounded-full animate-pulse opacity-40"></div>
+      <div className="absolute top-40 right-40 w-1.5 h-1.5 bg-destructive rounded-full animate-pulse opacity-50"></div>
     </section>
   );
 };

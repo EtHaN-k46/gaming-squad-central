@@ -225,14 +225,14 @@ const Calendar = () => {
                       return (
                         <div
                           key={day}
-                          className={`min-h-32 max-h-48 p-2 border border-gray-700 rounded-lg hover:border-gray-600 transition-colors ${
+                          className={`${dayEvents.length >= 2 ? 'min-h-40 max-h-56' : 'min-h-32 max-h-40'} p-2 border border-gray-700 rounded-lg hover:border-gray-600 transition-colors ${
                             isToday ? 'bg-red-600/10 border-red-600/50' : 'bg-gray-800/30'
-                          } ${dayEvents.length > 3 ? 'h-auto' : 'h-32'}`}
+                          }`}
                         >
                           <div className={`text-sm font-semibold mb-2 ${isToday ? 'text-red-500' : 'text-white'}`}>
                             {day}
                           </div>
-                          <div className="space-y-1 overflow-y-auto max-h-36">
+                          <div className="space-y-1 overflow-y-auto h-full max-h-44">
                             {dayEvents.map((event, eventIndex) => (
                               <div
                                 key={eventIndex}
