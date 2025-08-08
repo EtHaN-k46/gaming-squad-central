@@ -8,7 +8,7 @@ const Hero = () => {
   const { user } = useAuth();
 
   return (
-    <section className="relative min-h-screen bg-background dark:bg-gradient-to-br dark:from-background dark:via-muted dark:to-background flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
