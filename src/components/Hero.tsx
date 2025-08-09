@@ -79,7 +79,7 @@ const Hero = () => {
                 </Link>
                 <Link
                   to="/games"
-                  className="border border-border hover:border-muted-foreground text-foreground px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 hover:bg-muted/50"
+                  className="border border-white/30 hover:border-white text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 hover:bg-white/10"
                 >
                   Browse Games
                 </Link>
