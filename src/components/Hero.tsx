@@ -18,18 +18,15 @@ const Hero = () => {
         }}></div>
       </div>
 
-      {/* Team Image Background */}
-      <div className="absolute inset-0 flex items-center justify-end pr-20 opacity-80">
-        <div className="w-3/5 h-4/5 bg-gradient-to-l from-transparent via-muted/20 to-background/40 rounded-lg relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-transparent"></div>
-          {/* Placeholder for team image */}
-          <div className="w-full h-full bg-muted/30 flex items-center justify-center">
-            <div className="grid grid-cols-5 gap-4 opacity-60">
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="w-16 h-20 bg-border/50 rounded-lg"></div>
-              ))}
-            </div>
-          </div>
+      {/* Wolf Logo Background */}
+      <div className="absolute inset-0 flex items-center justify-end pr-20">
+        <div className="w-3/5 h-4/5 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10"></div>
+          <img 
+            src="/lovable-uploads/898091c3-03df-496f-a7ac-074c3d409d84.png" 
+            alt="Nitara Gaming Wolf Logo" 
+            className="w-full h-full object-contain opacity-20 filter brightness-75"
+          />
         </div>
       </div>
 
