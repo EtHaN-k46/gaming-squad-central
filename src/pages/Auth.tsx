@@ -88,16 +88,9 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      // Clean up existing auth state before signing in
-      cleanupAuthState();
-      
-      // Attempt global sign out to clear any existing sessions
-      try {
-        await signOut();
-      } catch (err) {
-        // Continue even if this fails
-      }
       if (isLogin) {
+        // Clean up existing auth state before signing in
+        cleanupAuthState();
         const { error } = await signIn(SecurityValidator.sanitizeInput(email), password);
         if (error) {
           toast({
