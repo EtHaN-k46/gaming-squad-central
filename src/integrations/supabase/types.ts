@@ -14,16 +14,207 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      division_heads: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          division: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          division: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          division?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          division: string
+          event_date: string
+          event_time: string | null
+          game: string
+          id: string
+          is_recurring: boolean | null
+          recurrence_day: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          division: string
+          event_date: string
+          event_time?: string | null
+          game: string
+          id?: string
+          is_recurring?: boolean | null
+          recurrence_day?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          division?: string
+          event_date?: string
+          event_time?: string | null
+          game?: string
+          id?: string
+          is_recurring?: boolean | null
+          recurrence_day?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      team_members: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          discord: string | null
+          division: string
+          id: string
+          instagram: string | null
+          is_captain: boolean | null
+          team_name: string | null
+          team_number: number
+          twitch: string | null
+          twitter: string | null
+          updated_at: string
+          username: string
+          youtube: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          discord?: string | null
+          division: string
+          id?: string
+          instagram?: string | null
+          is_captain?: boolean | null
+          team_name?: string | null
+          team_number?: number
+          twitch?: string | null
+          twitter?: string | null
+          updated_at?: string
+          username: string
+          youtube?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          discord?: string | null
+          division?: string
+          id?: string
+          instagram?: string | null
+          is_captain?: boolean | null
+          team_name?: string | null
+          team_number?: number
+          twitch?: string | null
+          twitter?: string | null
+          updated_at?: string
+          username?: string
+          youtube?: string | null
+        }
+        Relationships: []
+      }
+      team_settings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          division: string
+          id: string
+          team1_max_players: number | null
+          team1_name: string | null
+          team2_max_players: number | null
+          team2_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          division: string
+          id?: string
+          team1_max_players?: number | null
+          team1_name?: string | null
+          team2_max_players?: number | null
+          team2_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          division?: string
+          id?: string
+          team1_max_players?: number | null
+          team1_name?: string | null
+          team2_max_players?: number | null
+          team2_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          division: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          division?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          division?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "division_head" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +341,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "division_head", "user"],
+    },
   },
 } as const
