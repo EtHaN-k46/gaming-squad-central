@@ -7,271 +7,23 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
-      division_heads: {
-        Row: {
-          created_at: string | null
-          created_by: string
-          display_name: string
-          division: string
-          id: string
-          updated_at: string | null
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          created_by: string
-          display_name: string
-          division: string
-          id?: string
-          updated_at?: string | null
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string
-          display_name?: string
-          division?: string
-          id?: string
-          updated_at?: string | null
-          user_id?: string
-        }
-        Relationships: []
-      }
-      events: {
-        Row: {
-          created_at: string | null
-          created_by: string
-          description: string | null
-          division: string | null
-          event_date: string
-          event_time: string
-          game: string
-          id: string
-          is_recurring: boolean | null
-          recurrence_day: number | null
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          created_by: string
-          description?: string | null
-          division?: string | null
-          event_date: string
-          event_time: string
-          game: string
-          id?: string
-          is_recurring?: boolean | null
-          recurrence_day?: number | null
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string
-          description?: string | null
-          division?: string | null
-          event_date?: string
-          event_time?: string
-          game?: string
-          id?: string
-          is_recurring?: boolean | null
-          recurrence_day?: number | null
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          bio: string | null
-          created_at: string | null
-          first_name: string | null
-          id: string
-          is_division_head: boolean | null
-          last_name: string | null
-          preferred_division: string | null
-          updated_at: string | null
-          username: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
-          first_name?: string | null
-          id: string
-          is_division_head?: boolean | null
-          last_name?: string | null
-          preferred_division?: string | null
-          updated_at?: string | null
-          username?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
-          first_name?: string | null
-          id?: string
-          is_division_head?: boolean | null
-          last_name?: string | null
-          preferred_division?: string | null
-          updated_at?: string | null
-          username?: string | null
-        }
-        Relationships: []
-      }
-      team_members: {
-        Row: {
-          created_at: string | null
-          created_by: string
-          custom_team_name: string | null
-          discord: string | null
-          division: string
-          id: string
-          instagram: string | null
-          is_captain: boolean | null
-          team_name: string
-          team_number: number | null
-          twitch: string | null
-          twitter: string | null
-          updated_at: string | null
-          username: string
-          youtube: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          created_by: string
-          custom_team_name?: string | null
-          discord?: string | null
-          division: string
-          id?: string
-          instagram?: string | null
-          is_captain?: boolean | null
-          team_name: string
-          team_number?: number | null
-          twitch?: string | null
-          twitter?: string | null
-          updated_at?: string | null
-          username: string
-          youtube?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string
-          custom_team_name?: string | null
-          discord?: string | null
-          division?: string
-          id?: string
-          instagram?: string | null
-          is_captain?: boolean | null
-          team_name?: string
-          team_number?: number | null
-          twitch?: string | null
-          twitter?: string | null
-          updated_at?: string | null
-          username?: string
-          youtube?: string | null
-        }
-        Relationships: []
-      }
-      team_settings: {
-        Row: {
-          created_at: string | null
-          created_by: string
-          division: string
-          id: string
-          team1_max_players: number | null
-          team1_name: string | null
-          team2_max_players: number | null
-          team2_name: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          created_by: string
-          division: string
-          id?: string
-          team1_max_players?: number | null
-          team1_name?: string | null
-          team2_max_players?: number | null
-          team2_name?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          created_by?: string
-          division?: string
-          id?: string
-          team1_max_players?: number | null
-          team1_name?: string | null
-          team2_max_players?: number | null
-          team2_name?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          created_at: string | null
-          division: string | null
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          division?: string | null
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string | null
-          division?: string | null
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
-      users: {
-        Row: {
-          created_at: string
-          id: number
-        }
-        Insert: {
-          created_at?: string
-          id?: number
-        }
-        Update: {
-          created_at?: string
-          id?: number
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _user_id: string
-          _role: Database["public"]["Enums"]["app_role"]
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "division_head" | "user"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -398,8 +150,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "division_head", "user"],
-    },
+    Enums: {},
   },
 } as const
