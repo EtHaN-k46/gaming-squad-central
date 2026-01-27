@@ -245,6 +245,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      sanitize_existing_profiles: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "admin" | "division_head" | "user"
