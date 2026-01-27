@@ -1,12 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
-import { User, Save } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { LoadingButton } from '@/components/ui/button-loading';
-import { AvatarUpload } from '@/components/AvatarUpload';
+import { ProfileForm } from '@/components/profile/ProfileForm';
+import { ProfileSidebar } from '@/components/profile/ProfileSidebar';
+import type { ProfileUpdateData } from '@/lib/validation/profile';
 
 interface ProfileData {
   id: string;
@@ -22,7 +21,6 @@ const Profile = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState<ProfileData>({
     id: '',
     username: '',
@@ -57,60 +55,40 @@ const Profile = () => {
       }
 
       if (data) {
-        setProfile(data);
+        // Data from DB is trusted but we still handle null values safely
+        setProfile({
+          id: data.id,
+          username: data.username || '',
+          first_name: data.first_name || '',
+          last_name: data.last_name || '',
+          bio: data.bio || '',
+          avatar_url: data.avatar_url || '',
+        });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
       toast({
-        title: "Error loading profile",
-        description: error.message,
-        variant: "destructive",
+        title: 'Error loading profile',
+        description: errorMessage,
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setProfile(prev => ({ ...prev, [name]: value }));
-  };
-
   const handleAvatarUpdate = (url: string) => {
-    setProfile(prev => ({ ...prev, avatar_url: url }));
+    setProfile((prev) => ({ ...prev, avatar_url: url }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user?.id,
-          username: profile.username,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          bio: profile.bio,
-          avatar_url: profile.avatar_url,
-          updated_at: new Date().toISOString(),
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Profile updated!",
-        description: "Your profile has been saved successfully.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error saving profile",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setSaving(false);
-    }
+  const handleProfileUpdate = (data: ProfileUpdateData) => {
+    setProfile((prev) => ({
+      ...prev,
+      username: data.username,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      bio: data.bio,
+    }));
   };
 
   if (authLoading || loading) {
@@ -133,122 +111,36 @@ const Profile = () => {
             <h1 className="text-5xl font-bold text-white mb-6">
               Player <span className="text-red-500">Profile</span>
             </h1>
-            <p className="text-xl text-gray-400">
-              Manage your gaming profile
-            </p>
+            <p className="text-xl text-gray-400">Manage your gaming profile</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Profile Summary */}
+            {/* Profile Summary Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-800 sticky top-24">
-                <div className="text-center mb-6">
-                  <AvatarUpload
-                    userId={user.id}
-                    currentAvatarUrl={profile.avatar_url}
-                    onAvatarUpdate={handleAvatarUpdate}
-                  />
-                  <h3 className="text-xl font-bold text-white mt-4">{profile.username || 'Set username'}</h3>
-                  <p className="text-gray-400">{user.email}</p>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="text-white font-semibold mb-2">Full Name</h4>
-                    <div className="bg-gray-800/50 px-3 py-2 rounded-lg">
-                      <span className="text-gray-300">
-                        {profile.first_name || profile.last_name 
-                          ? `${profile.first_name} ${profile.last_name}`.trim()
-                          : 'Not set'
-                        }
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <ProfileSidebar
+                userId={user.id}
+                email={user.email || ''}
+                username={profile.username}
+                firstName={profile.first_name}
+                lastName={profile.last_name}
+                avatarUrl={profile.avatar_url}
+                onAvatarUpdate={handleAvatarUpdate}
+              />
             </div>
 
             {/* Profile Form */}
             <div className="lg:col-span-2">
-              <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Basic Information */}
-                <div className="bg-gray-900/50 rounded-xl p-6 border border-gray-800">
-                  <h3 className="text-xl font-bold text-white mb-6">Basic Information</h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-gray-300 text-sm font-medium mb-2">Username</label>
-                      <input
-                        type="text"
-                        name="username"
-                        value={profile.username}
-                        onChange={handleInputChange}
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-                        placeholder="Enter your username"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-gray-300 text-sm font-medium mb-2">Email</label>
-                      <input
-                        type="email"
-                        value={user.email || ''}
-                        disabled
-                        className="w-full bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 text-gray-400 cursor-not-allowed"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-gray-300 text-sm font-medium mb-2">First Name</label>
-                      <input
-                        type="text"
-                        name="first_name"
-                        value={profile.first_name}
-                        onChange={handleInputChange}
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-                        placeholder="Enter your first name"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-gray-300 text-sm font-medium mb-2">Last Name</label>
-                      <input
-                        type="text"
-                        name="last_name"
-                        value={profile.last_name}
-                        onChange={handleInputChange}
-                        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-                        placeholder="Enter your last name"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-6">
-                    <label className="block text-gray-300 text-sm font-medium mb-2">Bio</label>
-                    <textarea
-                      name="bio"
-                      value={profile.bio}
-                      onChange={handleInputChange}
-                      rows={4}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
-                      placeholder="Tell us about your gaming experience..."
-                    />
-                  </div>
-                </div>
-
-                {/* Save Button */}
-                <div className="text-center">
-                  <LoadingButton
-                    type="submit"
-                    loading={saving}
-                    loadingText="Saving..."
-                    className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold inline-flex items-center transition-colors"
-                  >
-                    <Save className="mr-2" size={20} />
-                    Save Profile
-                  </LoadingButton>
-                </div>
-              </form>
+              <ProfileForm
+                userId={user.id}
+                initialData={{
+                  username: profile.username,
+                  first_name: profile.first_name,
+                  last_name: profile.last_name,
+                  bio: profile.bio,
+                  avatar_url: profile.avatar_url,
+                }}
+                onUpdate={handleProfileUpdate}
+              />
             </div>
           </div>
         </div>
