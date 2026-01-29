@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingButton } from '@/components/ui/button-loading';
 import NotificationBanner from '@/components/NotificationBanner';
-import { SecurityValidator, RateLimiter, cleanupAuthState } from '@/utils/security';
+import { SecurityValidator, RateLimiter } from '@/utils/security';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
