@@ -89,8 +89,6 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        // Clean up existing auth state before signing in
-        cleanupAuthState();
         const { error } = await signIn(SecurityValidator.sanitizeInput(email), password);
         if (error) {
           toast({
