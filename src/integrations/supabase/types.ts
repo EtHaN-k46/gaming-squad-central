@@ -14,7 +14,222 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      division_heads: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          display_name: string
+          division: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          display_name: string
+          division: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          display_name?: string
+          division?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          division: string | null
+          event_date: string
+          event_time: string
+          game: string
+          id: string
+          is_recurring: boolean | null
+          recurrence_day: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          division?: string | null
+          event_date: string
+          event_time: string
+          game: string
+          id?: string
+          is_recurring?: boolean | null
+          recurrence_day?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          division?: string | null
+          event_date?: string
+          event_time?: string
+          game?: string
+          id?: string
+          is_recurring?: boolean | null
+          recurrence_day?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      team_members: {
+        Row: {
+          created_at: string
+          created_by: string
+          discord: string | null
+          division: string
+          id: string
+          instagram: string | null
+          is_captain: boolean
+          team_name: string
+          team_number: number
+          twitch: string | null
+          twitter: string | null
+          username: string
+          youtube: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          discord?: string | null
+          division: string
+          id?: string
+          instagram?: string | null
+          is_captain?: boolean
+          team_name?: string
+          team_number?: number
+          twitch?: string | null
+          twitter?: string | null
+          username: string
+          youtube?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          discord?: string | null
+          division?: string
+          id?: string
+          instagram?: string | null
+          is_captain?: boolean
+          team_name?: string
+          team_number?: number
+          twitch?: string | null
+          twitter?: string | null
+          username?: string
+          youtube?: string | null
+        }
+        Relationships: []
+      }
+      team_settings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          division: string
+          id: string
+          team1_max_players: number | null
+          team1_name: string | null
+          team2_max_players: number | null
+          team2_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          division: string
+          id?: string
+          team1_max_players?: number | null
+          team1_name?: string | null
+          team2_max_players?: number | null
+          team2_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          division?: string
+          id?: string
+          team1_max_players?: number | null
+          team1_name?: string | null
+          team2_max_players?: number | null
+          team2_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          division: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          division?: string | null
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          division?: string | null
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
