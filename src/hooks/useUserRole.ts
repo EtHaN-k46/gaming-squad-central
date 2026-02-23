@@ -31,7 +31,7 @@ export const useUserRole = () => {
           console.error('Error fetching user role:', error);
         }
 
-        setRole(data?.role || 'user');
+        setRole((data?.role as UserRole) || 'user');
         setUserDivision(data?.division || null);
       } catch (error) {
         console.error('Error fetching user role:', error);

@@ -206,6 +206,77 @@ export type Database = {
         }
         Relationships: []
       }
+      training_attendance: {
+        Row: {
+          checked_in_at: string
+          id: string
+          notes: string | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          checked_in_at?: string
+          id?: string
+          notes?: string | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          checked_in_at?: string
+          id?: string
+          notes?: string | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_attendance_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "training_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_sessions: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          division: string
+          id: string
+          is_active: boolean
+          session_date: string
+          session_time: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          division: string
+          id?: string
+          is_active?: boolean
+          session_date: string
+          session_time: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          division?: string
+          id?: string
+          is_active?: boolean
+          session_date?: string
+          session_time?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

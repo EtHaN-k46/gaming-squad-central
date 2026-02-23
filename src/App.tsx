@@ -19,6 +19,7 @@ import Profile from "./pages/Profile";
 import Players from "./pages/Players";
 import Games from "./pages/Games";
 import Dashboard from "./pages/Dashboard";
+import Attendance from "./pages/Attendance";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/players" element={<Players />} />
+              <Route path="/attendance" element={<Attendance />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
