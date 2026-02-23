@@ -33,6 +33,7 @@ const Header = () => {
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'About Us', path: '/about' },
     { name: 'Calendar', path: '/calendar' },
+    { name: 'Attendance', path: '/attendance' },
     { name: 'Players', path: '/players' },
     ...(user ? [{ name: 'Profile', path: '/profile' }] : []),
   ];
