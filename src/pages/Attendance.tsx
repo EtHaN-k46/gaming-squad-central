@@ -146,6 +146,18 @@ const Attendance = () => {
       if (error) throw error;
 
       toast({ title: 'Training session created!' });
+
+      // Send Discord notification (fire-and-forget)
+      supabase.functions.invoke('notify-discord', {
+        body: {
+          title: formTitle.trim(),
+          division: formDivision,
+          session_date: formDate,
+          session_time: formTime,
+          description: formDescription.trim() || null,
+        },
+      }).catch((err) => console.error('Discord notification failed:', err));
+
       setFormTitle('');
       setFormDescription('');
       setFormDivision('');
