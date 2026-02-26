@@ -16,14 +16,59 @@ serve(async (req) => {
       throw new Error('DISCORD_WEBHOOK_URL is not configured');
     }
 
-    const { title, division, session_date, session_time, description } = await req.json();
+    const body = await req.json();
+    const { title, division, session_date, session_time, description } = body;
 
-    if (!title || !division || !session_date || !session_time) {
+    // Validate required fields exist and are strings
+    if (
+      typeof title !== 'string' || !title.trim() ||
+      typeof division !== 'string' || !division.trim() ||
+      typeof session_date !== 'string' || !session_date.trim() ||
+      typeof session_time !== 'string' || !session_time.trim()
+    ) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields' }),
+        JSON.stringify({ error: 'Missing or invalid required fields' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Enforce length limits
+    if (title.length > 200 || division.length > 100 || session_date.length > 20 || session_time.length > 10) {
+      return new Response(
+        JSON.stringify({ error: 'Field length exceeds maximum allowed' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (description && (typeof description !== 'string' || description.length > 1000)) {
+      return new Response(
+        JSON.stringify({ error: 'Description must be a string under 1000 characters' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate date format (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(session_date)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid date format. Expected YYYY-MM-DD' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate time format (HH:MM or HH:MM:SS)
+    const timeRegex = /^\d{2}:\d{2}(:\d{2})?$/;
+    if (!timeRegex.test(session_time)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid time format. Expected HH:MM' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Sanitize text fields - trim and truncate for Discord embed limits
+    const safeTitle = title.trim().slice(0, 200);
+    const safeDivision = division.trim().slice(0, 100);
+    const safeDescription = description ? description.trim().slice(0, 1000) : null;
 
     // Format date nicely
     const dateObj = new Date(session_date + 'T00:00:00');
@@ -44,8 +89,8 @@ serve(async (req) => {
       title: '🏋️ New Training Session',
       color: 0xdc2626, // red-600
       fields: [
-        { name: '📋 Title', value: title, inline: false },
-        { name: '🎮 Division', value: division, inline: true },
+        { name: '📋 Title', value: safeTitle, inline: false },
+        { name: '🎮 Division', value: safeDivision, inline: true },
         { name: '📅 Date', value: formattedDate, inline: true },
         { name: '⏰ Time', value: formattedTime, inline: true },
       ],
@@ -53,8 +98,8 @@ serve(async (req) => {
       timestamp: new Date().toISOString(),
     };
 
-    if (description) {
-      embed.fields.splice(1, 0, { name: '📝 Description', value: description, inline: false });
+    if (safeDescription) {
+      embed.fields.splice(1, 0, { name: '📝 Description', value: safeDescription, inline: false });
     }
 
     const discordRes = await fetch(DISCORD_WEBHOOK_URL, {
