@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, User, Mail } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { LoadingButton } from '@/components/ui/button-loading';
 import NotificationBanner from '@/components/NotificationBanner';
-import { SecurityValidator, RateLimiter, cleanupAuthState } from '@/utils/security';
+import { SecurityValidator, RateLimiter } from '@/utils/security';
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,7 +19,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [csrfToken, setCsrfToken] = useState('');
   
-  const { signIn, signUp, signOut, user } = useAuth();
+  const { signIn, signUp, user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -33,7 +33,7 @@ const Auth = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Rate limiting check
     const clientId = `${navigator.userAgent}_${window.location.hostname}`;
     if (RateLimiter.isRateLimited(clientId, 5, 15 * 60 * 1000)) {
@@ -45,8 +45,10 @@ const Auth = () => {
       return;
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     // Input validation
-    if (!SecurityValidator.validateEmail(email)) {
+    if (!SecurityValidator.validateEmail(normalizedEmail)) {
       toast({
         title: "Invalid email",
         description: "Please enter a valid email address.",
@@ -89,7 +91,7 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { error } = await signIn(SecurityValidator.sanitizeInput(email), password);
+        const { error } = await signIn(normalizedEmail, password);
         if (error) {
           toast({
             title: "Error signing in",
@@ -106,7 +108,7 @@ const Auth = () => {
           window.location.href = '/';
         }
       } else {
-        const { error } = await signUp(SecurityValidator.sanitizeInput(email), password, {
+        const { error } = await signUp(normalizedEmail, password, {
           first_name: SecurityValidator.sanitizeInput(firstName),
           last_name: SecurityValidator.sanitizeInput(lastName),
           username: SecurityValidator.sanitizeInput(username),
@@ -125,10 +127,15 @@ const Auth = () => {
           });
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      console.error('Auth submit failed:', error);
+      const isFetchError = error instanceof TypeError && /Failed to fetch/i.test(error.message);
+
       toast({
         title: "An error occurred",
-        description: error.message,
+        description: isFetchError
+          ? "Network error while creating your account. Disable ad blockers/VPN and try again."
+          : (error instanceof Error ? error.message : "Unexpected error"),
         variant: "destructive",
       });
     } finally {
@@ -206,8 +213,6 @@ const Auth = () => {
                       className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                       placeholder="gamerpro123"
                       maxLength={30}
-                      pattern="[a-zA-Z0-9_-]{3,30}"
-                      title="Username must be 3-30 characters and contain only letters, numbers, underscores, and hyphens"
                       required
                     />
                   </div>
@@ -221,7 +226,7 @@ const Auth = () => {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(SecurityValidator.sanitizeInput(e.target.value))}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500"
                   placeholder="Enter your email"
                   maxLength={254}
