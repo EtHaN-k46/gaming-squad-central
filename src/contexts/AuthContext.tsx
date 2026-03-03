@@ -53,25 +53,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
+  const withNetworkRetry = async <T,>(operation: () => Promise<T>): Promise<T> => {
+    try {
+      return await operation();
+    } catch (error) {
+      const isFetchError = error instanceof TypeError && /Failed to fetch/i.test(error.message);
+      if (!isFetchError) throw error;
+
+      // Retry once for transient browser/network hiccups
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      return operation();
+    }
+  };
+
   const signUp = async (email: string, password: string, userData?: any) => {
     const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: userData
-      }
-    });
+
+    const { error } = await withNetworkRetry(() =>
+      supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: userData,
+        },
+      })
+    );
+
     return { error };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } = await withNetworkRetry(() =>
+      supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+    );
+
     return { error };
   };
 
