@@ -164,13 +164,6 @@ const Auth = () => {
               </p>
             </div>
 
-            {!isLogin && (
-              <NotificationBanner
-                message="After signing up, please check your email to verify your account before signing in."
-                type="info"
-                dismissible={false}
-              />
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <input type="hidden" name="csrf_token" value={csrfToken} />
