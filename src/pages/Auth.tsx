@@ -123,7 +123,7 @@ const Auth = () => {
           RateLimiter.clearAttempts(clientId); // Clear rate limit on success
           toast({
             title: "Account created!",
-            description: "Please check your email to verify your account.",
+            description: "You can now sign in with your credentials.",
           });
         }
       }
