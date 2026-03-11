@@ -129,12 +129,16 @@ const Auth = () => {
       }
     } catch (error: unknown) {
       console.error('Auth submit failed:', error);
+      console.error('Error type:', typeof error, error?.constructor?.name);
+      if (error instanceof Error) {
+        console.error('Error name:', error.name, 'Message:', error.message);
+      }
       const isFetchError = error instanceof TypeError && /Failed to fetch/i.test(error.message);
 
       toast({
         title: "An error occurred",
         description: isFetchError
-          ? "Network error while creating your account. Disable ad blockers/VPN and try again."
+          ? "Network error — please try: 1) Open this page in a new browser tab (not the iframe), 2) Disable ad blockers/VPN, 3) Try again."
           : (error instanceof Error ? error.message : "Unexpected error"),
         variant: "destructive",
       });
