@@ -123,7 +123,7 @@ const Auth = () => {
           RateLimiter.clearAttempts(clientId); // Clear rate limit on success
           toast({
             title: "Account created!",
-            description: "Please check your email to verify your account.",
+            description: "You can now sign in with your credentials.",
           });
         }
       }
@@ -164,13 +164,6 @@ const Auth = () => {
               </p>
             </div>
 
-            {!isLogin && (
-              <NotificationBanner
-                message="After signing up, please check your email to verify your account before signing in."
-                type="info"
-                dismissible={false}
-              />
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <input type="hidden" name="csrf_token" value={csrfToken} />
