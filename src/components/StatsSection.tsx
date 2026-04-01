@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Users, Trophy, Star, Target } from 'lucide-react';
 
